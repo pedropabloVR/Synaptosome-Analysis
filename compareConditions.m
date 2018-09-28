@@ -7,9 +7,13 @@ clc
 % dir_EGTA  = 'F:\Data\Synaptosomes\Experiment_37C\Results\Results_egta';
 % dir_EGTAK = 'F:\Data\Synaptosomes\Experiment_37C\Results\Results_egtak';
 
-dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_phys';
-dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egta';
-dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egtak';
+dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_phys';
+dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egta';
+dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egtak';
+
+% dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_phys';
+% dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egta';
+% dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egtak';
 
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results';
 %output_dir = 'F:\Dump';
@@ -241,25 +245,6 @@ results_EGTA  = results_EGTA(results_EGTA.OverlapWithBlue   > 20,:);
 results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithBlue > 20,:);
 
 
-%% Merge tables of the three conditions after filtering
-
-results_combined_after_filtering = [results_PHYS; results_EGTA; results_EGTAK];
-
-clear var phys egta egtak
-[phys{1:size(results_PHYS,1)}] = deal('phys');
-[egta{1:size(results_EGTA,1)}] = deal('egta');
-[egtak{1:size(results_EGTAK,1)}] = deal('egtak');
-condition_column = [phys egta egtak];
-
-results_combined_after_filtering.condition = condition_column';
-results_combined_after_filtering = results_combined_after_filtering(:,[end 1:end-1]);
-
-path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.mat');
-save(path_results_combined,'results_combined_after_filtering');
-
-path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.txt');
-writetable(results_combined_after_filtering,path_results_combined,'Delimiter','\t');
-
 %% Ripley's K analysis
 
 % Create new subfolder in output folder
@@ -386,12 +371,26 @@ for i = 1:length(sampleIDs)
     ripley_GB = [ripley_GB ripley_GB_i];
 end
 
-H_all_phys_RC = ripley_RR(:,all(~isnan(ripley_RR)));
-H_all_phys_GC = ripley_GG(:,all(~isnan(ripley_GG)));
-H_all_phys_BC = ripley_BB(:,all(~isnan(ripley_BB)));
-H_all_phys_RG = ripley_RG(:,all(~isnan(ripley_RG)));
-H_all_phys_RB = ripley_RB(:,all(~isnan(ripley_RB)));
-H_all_phys_GB = ripley_GB(:,all(~isnan(ripley_GB)));
+% H_all_phys_RC = ripley_RR(:,all(~isnan(ripley_RR)));
+% H_all_phys_GC = ripley_GG(:,all(~isnan(ripley_GG)));
+% H_all_phys_BC = ripley_BB(:,all(~isnan(ripley_BB)));
+% H_all_phys_RG = ripley_RG(:,all(~isnan(ripley_RG)));
+% H_all_phys_RB = ripley_RB(:,all(~isnan(ripley_RB)));
+% H_all_phys_GB = ripley_GB(:,all(~isnan(ripley_GB)));
+
+H_all_phys_RC = ripley_RR;
+H_all_phys_GC = ripley_GG;
+H_all_phys_BC = ripley_BB;
+H_all_phys_RG = ripley_RG;
+H_all_phys_RB = ripley_RB;
+H_all_phys_GB = ripley_GB;
+
+
+% Write away Ripley's functions before removing NaN columns (to retain
+% information about from which synaptosome the curve came)
+path_ripley_phys = fullfile(path_output_ripley,'H_phys.mat');
+save(path_ripley_phys,'ripley_RR','ripley_GG','ripley_BB',...
+                      'ripley_RG','ripley_RB','ripley_GB');
 
 
 % EGTA condition ----------------------------------------------------------
@@ -510,13 +509,27 @@ for i = 1:length(sampleIDs)
     ripley_GB = [ripley_GB ripley_GB_i];
 end
 
-H_all_egta_RC = ripley_RR(:,all(~isnan(ripley_RR)));
-H_all_egta_GC = ripley_GG(:,all(~isnan(ripley_GG)));
-H_all_egta_BC = ripley_BB(:,all(~isnan(ripley_BB)));
-H_all_egta_RG = ripley_RG(:,all(~isnan(ripley_RG)));
-H_all_egta_RB = ripley_RB(:,all(~isnan(ripley_RB)));
-H_all_egta_GB = ripley_GB(:,all(~isnan(ripley_GB)));
+% H_all_egta_RC = ripley_RR(:,all(~isnan(ripley_RR)));
+% H_all_egta_GC = ripley_GG(:,all(~isnan(ripley_GG)));
+% H_all_egta_BC = ripley_BB(:,all(~isnan(ripley_BB)));
+% H_all_egta_RG = ripley_RG(:,all(~isnan(ripley_RG)));
+% H_all_egta_RB = ripley_RB(:,all(~isnan(ripley_RB)));
+% H_all_egta_GB = ripley_GB(:,all(~isnan(ripley_GB)));
 
+H_all_egta_RC = ripley_RR;
+H_all_egta_GC = ripley_GG;
+H_all_egta_BC = ripley_BB;
+H_all_egta_RG = ripley_RG;
+H_all_egta_RB = ripley_RB;
+H_all_egta_GB = ripley_GB;
+
+
+% Write away Ripley's functions before removing NaN columns (to retain
+% information about from which synaptosome the curve came)
+path_ripley_egta = fullfile(path_output_ripley,'H_egta.mat');
+save(path_ripley_egta,'ripley_RR','ripley_GG','ripley_BB',...
+                      'ripley_RG','ripley_RB','ripley_GB');
+                  
 
 % EGTAK condition ---------------------------------------------------------
 
@@ -634,13 +647,28 @@ for i = 1:length(sampleIDs)
     ripley_GB = [ripley_GB ripley_GB_i];
 end
 
-H_all_egtak_RC = ripley_RR(:,all(~isnan(ripley_RR)));
-H_all_egtak_GC = ripley_GG(:,all(~isnan(ripley_GG)));
-H_all_egtak_BC = ripley_BB(:,all(~isnan(ripley_BB)));
-H_all_egtak_RG = ripley_RG(:,all(~isnan(ripley_RG)));
-H_all_egtak_RB = ripley_RB(:,all(~isnan(ripley_RB)));
-H_all_egtak_GB = ripley_GB(:,all(~isnan(ripley_GB)));
+% H_all_egtak_RC = ripley_RR(:,all(~isnan(ripley_RR)));
+% H_all_egtak_GC = ripley_GG(:,all(~isnan(ripley_GG)));
+% H_all_egtak_BC = ripley_BB(:,all(~isnan(ripley_BB)));
+% H_all_egtak_RG = ripley_RG(:,all(~isnan(ripley_RG)));
+% H_all_egtak_RB = ripley_RB(:,all(~isnan(ripley_RB)));
+% H_all_egtak_GB = ripley_GB(:,all(~isnan(ripley_GB)));
 
+H_all_egtak_RC = ripley_RR;
+H_all_egtak_GC = ripley_GG;
+H_all_egtak_BC = ripley_BB;
+H_all_egtak_RG = ripley_RG;
+H_all_egtak_RB = ripley_RB;
+H_all_egtak_GB = ripley_GB;
+
+
+% Write away Ripley's functions before removing NaN columns (to retain
+% information about from which synaptosome the curve came)
+path_ripley_egtak = fullfile(path_output_ripley,'H_egtak.mat');
+save(path_ripley_egtak,'ripley_RR','ripley_GG','ripley_BB',...
+                      'ripley_RG','ripley_RB','ripley_GB');
+
+% Write away Ripley's functions after removing NaN columns
 path_H = fullfile(path_output_ripley,'H_all.mat');
 save(path_H,'H_all_phys_RC','H_all_phys_GC','H_all_phys_BC',...
             'H_all_phys_RG','H_all_phys_RB','H_all_phys_GB',...
@@ -667,11 +695,26 @@ save(path_H,'H_all_phys_RC','H_all_phys_GC','H_all_phys_BC',...
 [clustersize_egta_BC,  Mean_egta_BC,  SD_egta_BC]  = getStatsClustersize(r_hist,H_all_egta_BC);
 [clustersize_egtak_BC, Mean_egtak_BC, SD_egtak_BC] = getStatsClustersize(r_hist,H_all_egtak_BC);
 
+% Add the values to the results tables
+results_PHYS.clustersizeRC = clustersize_phys_RC;
+results_PHYS.clustersizeGC = clustersize_phys_GC;
+results_PHYS.clustersizeBC = clustersize_phys_BC;
+
+results_EGTA.clustersizeRC = clustersize_egta_RC;
+results_EGTA.clustersizeGC = clustersize_egta_GC;
+results_EGTA.clustersizeBC = clustersize_egta_BC;
+
+results_EGTAK.clustersizeRC = clustersize_egtak_RC;
+results_EGTAK.clustersizeGC = clustersize_egtak_GC;
+results_EGTAK.clustersizeBC = clustersize_egtak_BC;
+
+
 path_clustersizes = fullfile(path_output_ripley,'clustersizes.mat');
 save(path_clustersizes,'clustersize_phys_RC','clustersize_egta_RC','clustersize_egtak_RC',...
                        'clustersize_phys_GC','clustersize_egta_GC','clustersize_egtak_GC',...
                        'clustersize_phys_BC','clustersize_egta_BC','clustersize_egtak_BC');
 
+                   
 % Convert results to tables and write away as tab-delimited txt file
 % (so they can be easily read in in R)
 
@@ -726,6 +769,21 @@ writetable(results_clustersize_BC,path_results_clustersize_BC,'Delimiter','\t');
 [interclusterdist_egta_GB,  Mean_egta_GB,  SD_egta_GB]  = getStatsClustersize(r_hist,H_all_egta_GB);
 [interclusterdist_egtak_GB, Mean_egtak_GB, SD_egtak_GB] = getStatsClustersize(r_hist,H_all_egtak_GB);
 
+
+% Add the values to the results tables
+results_PHYS.interclusterdistRG = interclusterdist_phys_RG;
+results_PHYS.interclusterdistRB = interclusterdist_phys_RB;
+results_PHYS.interclusterdistGB = interclusterdist_phys_GB;
+
+results_EGTA.interclusterdistRG = interclusterdist_egta_RG;
+results_EGTA.interclusterdistRB = interclusterdist_egta_RB;
+results_EGTA.interclusterdistGB = interclusterdist_egta_GB;
+
+results_EGTAK.interclusterdistRG = interclusterdist_egtak_RG;
+results_EGTAK.interclusterdistRB = interclusterdist_egtak_RB;
+results_EGTAK.interclusterdistGB = interclusterdist_egtak_GB;
+
+
 path_clustersizes = fullfile(path_output_ripley,'interclusterdist.mat');
 save(path_clustersizes,'interclusterdist_phys_RG','interclusterdist_egta_RG','interclusterdist_egtak_RG',...
                        'interclusterdist_phys_RB','interclusterdist_egta_RB','interclusterdist_egtak_RB',...
@@ -767,6 +825,34 @@ results_interclusterdist_GB.conditions = [phys egta egtak]';
 results_interclusterdist_GB = results_interclusterdist_GB(:,[end 1:end-1]);
 path_results_interclusterdist_GB = fullfile(path_output_ripley,'interclusterdist_GB.txt');
 writetable(results_interclusterdist_GB,path_results_interclusterdist_GB,'Delimiter','\t');
+
+
+%% Merge tables of the three conditions after filtering
+
+results_combined_after_filtering = [results_PHYS; results_EGTA; results_EGTAK];
+
+clear var phys egta egtak
+[phys{1:size(results_PHYS,1)}] = deal('phys');
+[egta{1:size(results_EGTA,1)}] = deal('egta');
+[egtak{1:size(results_EGTAK,1)}] = deal('egtak');
+condition_column = [phys egta egtak];
+
+results_combined_after_filtering.condition = condition_column';
+results_combined_after_filtering = results_combined_after_filtering(:,[end 1:end-1]);
+
+% Remove rows that have -1 value in any of the Ripley's columns
+results_combined_after_filtering(ismember(results_combined_after_filtering.clustersizeRC,-1),:)=[];
+results_combined_after_filtering(ismember(results_combined_after_filtering.clustersizeGC,-1),:)=[];
+results_combined_after_filtering(ismember(results_combined_after_filtering.clustersizeBC,-1),:)=[];
+results_combined_after_filtering(ismember(results_combined_after_filtering.interclusterdistRG,-1),:)=[];
+results_combined_after_filtering(ismember(results_combined_after_filtering.interclusterdistRB,-1),:)=[];
+results_combined_after_filtering(ismember(results_combined_after_filtering.interclusterdistGB,-1),:)=[];
+
+path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.mat');
+save(path_results_combined,'results_combined_after_filtering');
+
+path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.txt');
+writetable(results_combined_after_filtering,path_results_combined,'Delimiter','\t');
 
 
 %% Mark detected synaptosomes on three-colour reconstructions
@@ -1056,14 +1142,14 @@ set(h{1},'color','k','markersize',10);
 ylabel('Cluster size (nm)');
 title('Clustersize mCling');
 set(gca,'fontsize',14);
-ylim([0 1000])
+%ylim([0 1000])
 
 subplot(122) % boxplot
 boxplot([clustersize_phys_RC; clustersize_egta_RC; clustersize_egtak_RC],conditions);
 ylabel('Cluster size (nm)');
 title('Clustersize mCling');
 set(gca,'fontsize',14);
-ylim([0 1000])
+%ylim([0 1000])
 
 if flagprint
     savefig(fig8,fullfile(path_figures_ripley,'clustersize_mCling.fig'))
@@ -1095,14 +1181,14 @@ set(h{1},'color','k','markersize',10);
 ylabel('Cluster size (nm)');
 title('Clustersize a-synuclein');
 set(gca,'fontsize',14);
-ylim([0 1000])
+%ylim([0 1000])
 
 subplot(122) % boxplot
 boxplot([clustersize_phys_GC; clustersize_egta_GC; clustersize_egtak_GC],conditions);
 ylabel('Cluster size (nm)');
 title('Clustersize a-synuclein');
 set(gca,'fontsize',14);
-ylim([0 1000])
+%ylim([0 1000])
 
 if flagprint
     savefig(fig9,fullfile(path_figures_ripley,'clustersize_a-synuclein.fig'))
@@ -1134,14 +1220,14 @@ set(h{1},'color','k','markersize',10);
 ylabel('Cluster size (nm)');
 title('Clustersize VAMP2');
 set(gca,'fontsize',14);
-ylim([0 1000])
+%ylim([0 1000])
 
 subplot(122) % boxplot
 boxplot([clustersize_phys_BC; clustersize_egta_BC; clustersize_egtak_BC],conditions);
 ylabel('Cluster size (nm)');
 title('Clustersize VAMP2');
 set(gca,'fontsize',14);
-ylim([0 1000])
+%ylim([0 1000])
 
 if flagprint
     savefig(fig10,fullfile(path_figures_ripley,'clustersize_VAMP2.fig'))
@@ -1278,22 +1364,33 @@ ymin = 0;
 ymax = 6000;
 
 % mCLING
-fig1 = RipleyPlot(r_hist,H_all_phys_RC, 'red','mCling PHYS',[ymin ymax]);
-fig2 = RipleyPlot(r_hist,H_all_egta_RC, 'red','mCling EGTA',[ymin ymax]);
-fig3 = RipleyPlot(r_hist,H_all_egtak_RC,'red','mCling EGTA/K+',[ymin ymax]);
-fig4 = RipleyPlotMeansConditions(r_hist, H_all_phys_RC, H_all_egta_RC, H_all_egtak_RC, {'PHYS','EGTA','EGTA/K+'},'Mean of Ripley''s - mCling');
+
+
+fig1 = RipleyPlot(r_hist,H_all_phys_RC(:,all(~isnan(H_all_phys_RC))),'red','mCling PHYS',[ymin ymax]);
+fig2 = RipleyPlot(r_hist,H_all_egta_RC(:,all(~isnan(H_all_egta_RC))),'red','mCling EGTA',[ymin ymax]);
+fig3 = RipleyPlot(r_hist,H_all_egtak_RC(:,all(~isnan(H_all_egtak_RC))),'red','mCling EGTA/K+',[ymin ymax]);
+fig4 = RipleyPlotMeansConditions(r_hist, H_all_phys_RC(:,all(~isnan(H_all_phys_RC))),...
+                                         H_all_egta_RC(:,all(~isnan(H_all_egta_RC))),...
+                                         H_all_egtak_RC(:,all(~isnan(H_all_egtak_RC))),...
+                                         {'PHYS','EGTA','EGTA/K+'},'Mean of Ripley''s - mCling');
 
 % a-synuclein
-fig5 = RipleyPlot(r_hist,H_all_phys_GC, 'green','a-synuclein PHYS',[ymin ymax]);
-fig6 = RipleyPlot(r_hist,H_all_egta_GC, 'green','a-synuclein EGTA',[ymin ymax]);
-fig7 = RipleyPlot(r_hist,H_all_egtak_GC,'green','a-synuclein EGTA/K+',[ymin ymax]);
-fig8 = RipleyPlotMeansConditions(r_hist, H_all_phys_GC, H_all_egta_GC, H_all_egtak_GC, {'PHYS','EGTA','EGTA/K+'},'Mean of Ripley''s - a-synuclein');
+fig5 = RipleyPlot(r_hist,H_all_phys_GC(:,all(~isnan(H_all_phys_GC))), 'green','a-synuclein PHYS',[ymin ymax]);
+fig6 = RipleyPlot(r_hist,H_all_egta_GC(:,all(~isnan(H_all_egta_GC))), 'green','a-synuclein EGTA',[ymin ymax]);
+fig7 = RipleyPlot(r_hist,H_all_egtak_GC(:,all(~isnan(H_all_egtak_GC))),'green','a-synuclein EGTA/K+',[ymin ymax]);
+fig8 = RipleyPlotMeansConditions(r_hist, H_all_phys_GC(:,all(~isnan(H_all_phys_GC))),...
+                                         H_all_egta_GC(:,all(~isnan(H_all_egta_GC))),...
+                                         H_all_egtak_GC(:,all(~isnan(H_all_egtak_GC))),...
+                                         {'PHYS','EGTA','EGTA/K+'},'Mean of Ripley''s - a-synuclein');
 
 % VAMP2
-fig9  = RipleyPlot(r_hist,H_all_phys_BC, 'blue','VAMP2 PHYS',[ymin ymax]);
-fig10 = RipleyPlot(r_hist,H_all_egta_BC, 'blue','VAMP2 EGTA',[ymin ymax]);
-fig11 = RipleyPlot(r_hist,H_all_egtak_BC,'blue','VAMP2 EGTA/K+',[ymin ymax]);
-fig12 = RipleyPlotMeansConditions(r_hist, H_all_phys_BC, H_all_egta_BC, H_all_egtak_BC, {'PHYS','EGTA','EGTA/K+'},'Mean of Ripley''s - VAMP2');
+fig9  = RipleyPlot(r_hist,H_all_phys_BC(:,all(~isnan(H_all_phys_BC))), 'blue','VAMP2 PHYS',[ymin ymax]);
+fig10 = RipleyPlot(r_hist,H_all_egta_BC(:,all(~isnan(H_all_egta_BC))), 'blue','VAMP2 EGTA',[ymin ymax]);
+fig11 = RipleyPlot(r_hist,H_all_egtak_BC(:,all(~isnan(H_all_egtak_BC))),'blue','VAMP2 EGTA/K+',[ymin ymax]);
+fig12 = RipleyPlotMeansConditions(r_hist, H_all_phys_BC(:,all(~isnan(H_all_phys_BC))),...
+                                          H_all_egta_BC(:,all(~isnan(H_all_egta_BC))),...
+                                          H_all_egtak_BC(:,all(~isnan(H_all_egtak_BC))),...
+                                          {'PHYS','EGTA','EGTA/K+'},'Mean of Ripley''s - VAMP2');
 
 if flagprint
     savefig(fig1 ,fullfile(path_ripley_curves,'ripley_mcling_phys.fig'))
