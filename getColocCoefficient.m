@@ -17,12 +17,12 @@
 % images are switched.
 %
 % INPUT:
-%   A, B: arrays with the same dimensions
+%   A, B............: arrays with the same dimensions
 % 
 % OUTPUT:
-%   X.pearsonCoeff: Pearson's correlation coefficient
-%   X.mandersCoeff: Mander's overlap coefficient
-%   X.M1 and X.M2:  Mander's M1 and M2 coefficients
+%   X.pearsonCoeff..: Pearson's correlation coefficient
+%   X.mandersCoeff..: Mander's overlap coefficient
+%   X.M1 and X.M2...: Mander's M1 and M2 coefficients
 % 
 % 
 % Author: Ezra Bruggeman, Laser Analytics Group
