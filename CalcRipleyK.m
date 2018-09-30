@@ -1,3 +1,5 @@
+% Author: Dr Romain Laine, rfl30@cam.ac.uk, Laser Analytics Group 2015-11-03
+
 function [ r_hist, N_hist, K, N_loc_s, D ] = CalcRipleyK( X1, Y1, X2, Y2, Fov, Area, Analysis_window, r_step )
 % For single color Ripley K calculation, simply have CalcRipleyK( X, Y, X, Y, Fov, Area, Analysis_window, r_step )
 % Area should already be in nm^2
