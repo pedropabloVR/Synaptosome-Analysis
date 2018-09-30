@@ -290,6 +290,7 @@ for i = 1:length(sampleIDs)
     
     % Get number of synaptosomes and coordinates of their centroids
     results_PHYS_i = results_PHYS(strcmp(results_PHYS.sampleID,sampleIDs(i)),:);
+    synaptosomeID = results_PHYS_i.synaptosomeID;
     num_synaptosomes = size(results_PHYS_i,1);
     X_c = results_PHYS_i.xCentroid;
     Y_c = results_PHYS_i.yCentroid;
@@ -305,7 +306,6 @@ for i = 1:length(sampleIDs)
     
     % Loop over all synaptosomes
     for j = 1:num_synaptosomes
-        count = count + 1;
         
         % Get coordinates of synaptosome
         x_c = X_c(j)*magnification;
@@ -317,9 +317,9 @@ for i = 1:length(sampleIDs)
         locs_BC_cropped = cropLocsAroundCentroid(locs_BC,x_c,y_c,(windowsize/magnification)*pixelsize);
         
         % Write away cropped localisation files
-        writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(condition,num2str(count),'.csv')),format)
-        writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(condition,num2str(count),'.csv')),format)
-        writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(condition,num2str(count),'.csv')),format)
+        writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
         
         X_RC = locs_RC_cropped.x;
         Y_RC = locs_RC_cropped.y;
@@ -338,9 +338,9 @@ for i = 1:length(sampleIDs)
         img_GC = generateImage(X_GC-min(X_GC)+1, Y_GC-min(Y_GC)+1, sigma, intensities_GC, windowsize/magnification, pixelsize, magnification);
         img_BC = generateImage(X_BC-min(X_BC)+1, Y_BC-min(Y_BC)+1, sigma, intensities_BC, windowsize/magnification, pixelsize, magnification);
         
-        img_name_RC = strcat(char(sampleIDs(i)),'_RC_synaptosome_',num2str(j),'.png');
-        img_name_GC = strcat(char(sampleIDs(i)),'_GC_synaptosome_',num2str(j),'.png');
-        img_name_BC = strcat(char(sampleIDs(i)),'_BC_synaptosome_',num2str(j),'.png');
+        img_name_RC = strcat(char(sampleIDs(i)),'_RC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_GC = strcat(char(sampleIDs(i)),'_GC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_BC = strcat(char(sampleIDs(i)),'_BC_synaptosome_',num2str(synaptosomeID(j)),'.png');
         
         imwrite(flip(flip(img_RC,1),2),fullfile(path_output_ripley,condition,'images',img_name_RC));
         imwrite(flip(flip(img_GC,1),2),fullfile(path_output_ripley,condition,'images',img_name_GC));
@@ -370,6 +370,7 @@ for i = 1:length(sampleIDs)
     ripley_RB = [ripley_RB ripley_RB_i];
     ripley_GB = [ripley_GB ripley_GB_i];
 end
+
 
 % H_all_phys_RC = ripley_RR(:,all(~isnan(ripley_RR)));
 % H_all_phys_GC = ripley_GG(:,all(~isnan(ripley_GG)));
@@ -428,6 +429,7 @@ for i = 1:length(sampleIDs)
     
     % Get number of synaptosomes and coordinates of their centroids
     results_EGTA_i = results_EGTA(strcmp(results_EGTA.sampleID,sampleIDs(i)),:);
+    synaptosomeID = results_EGTA_i.synaptosomeID;
     num_synaptosomes = size(results_EGTA_i,1);
     X_c = results_EGTA_i.xCentroid;
     Y_c = results_EGTA_i.yCentroid;
@@ -443,7 +445,6 @@ for i = 1:length(sampleIDs)
     
     % Loop over all synaptosomes
     for j = 1:num_synaptosomes
-        count = count + 1;
         
         % Get coordinates of synaptosome
         x_c = X_c(j)*magnification;
@@ -455,9 +456,9 @@ for i = 1:length(sampleIDs)
         locs_BC_cropped = cropLocsAroundCentroid(locs_BC,x_c,y_c,(windowsize/magnification)*pixelsize);
         
         % Write away cropped localisation files
-        writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(condition,num2str(count),'.csv')),format)
-        writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(condition,num2str(count),'.csv')),format)
-        writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(condition,num2str(count),'.csv')),format)
+        writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
         
         X_RC = locs_RC_cropped.x;
         Y_RC = locs_RC_cropped.y;
@@ -476,9 +477,9 @@ for i = 1:length(sampleIDs)
         img_GC = generateImage(X_GC-min(X_GC)+1, Y_GC-min(Y_GC)+1, sigma, intensities_GC, windowsize/magnification, pixelsize, magnification);
         img_BC = generateImage(X_BC-min(X_BC)+1, Y_BC-min(Y_BC)+1, sigma, intensities_BC, windowsize/magnification, pixelsize, magnification);
         
-        img_name_RC = strcat(char(sampleIDs(i)),'_RC_synaptosome_',num2str(j),'.png');
-        img_name_GC = strcat(char(sampleIDs(i)),'_GC_synaptosome_',num2str(j),'.png');
-        img_name_BC = strcat(char(sampleIDs(i)),'_BC_synaptosome_',num2str(j),'.png');
+        img_name_RC = strcat(char(sampleIDs(i)),'_RC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_GC = strcat(char(sampleIDs(i)),'_GC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_BC = strcat(char(sampleIDs(i)),'_BC_synaptosome_',num2str(synaptosomeID(j)),'.png');
         
         imwrite(flip(flip(img_RC,1),2),fullfile(path_output_ripley,condition,'images',img_name_RC));
         imwrite(flip(flip(img_GC,1),2),fullfile(path_output_ripley,condition,'images',img_name_GC));
@@ -566,6 +567,7 @@ for i = 1:length(sampleIDs)
     
     % Get number of synaptosomes and coordinates of their centroids
     results_EGTAK_i = results_EGTAK(strcmp(results_EGTAK.sampleID,sampleIDs(i)),:);
+    synaptosomeID = results_EGTAK_i.synaptosomeID;
     num_synaptosomes = size(results_EGTAK_i,1);
     X_c = results_EGTAK_i.xCentroid;
     Y_c = results_EGTAK_i.yCentroid;
@@ -581,7 +583,6 @@ for i = 1:length(sampleIDs)
     
     % Loop over all synaptosomes
     for j = 1:num_synaptosomes
-        count = count + 1;
         
         % Get coordinates of synaptosome
         x_c = X_c(j)*magnification;
@@ -593,9 +594,9 @@ for i = 1:length(sampleIDs)
         locs_BC_cropped = cropLocsAroundCentroid(locs_BC,x_c,y_c,(windowsize/magnification)*pixelsize);
         
         % Write away cropped localisation files
-        writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(condition,num2str(count),'.csv')),format)
-        writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(condition,num2str(count),'.csv')),format)
-        writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(condition,num2str(count),'.csv')),format)
+        writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
         
         X_RC = locs_RC_cropped.x;
         Y_RC = locs_RC_cropped.y;
@@ -614,9 +615,9 @@ for i = 1:length(sampleIDs)
         img_GC = generateImage(X_GC-min(X_GC)+1, Y_GC-min(Y_GC)+1, sigma, intensities_GC, windowsize/magnification, pixelsize, magnification);
         img_BC = generateImage(X_BC-min(X_BC)+1, Y_BC-min(Y_BC)+1, sigma, intensities_BC, windowsize/magnification, pixelsize, magnification);
         
-        img_name_RC = strcat(char(sampleIDs(i)),'_RC_synaptosome_',num2str(j),'.png');
-        img_name_GC = strcat(char(sampleIDs(i)),'_GC_synaptosome_',num2str(j),'.png');
-        img_name_BC = strcat(char(sampleIDs(i)),'_BC_synaptosome_',num2str(j),'.png');
+        img_name_RC = strcat(char(sampleIDs(i)),'_RC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_GC = strcat(char(sampleIDs(i)),'_GC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_BC = strcat(char(sampleIDs(i)),'_BC_synaptosome_',num2str(synaptosomeID(j)),'.png');
         
         imwrite(flip(flip(img_RC,1),2),fullfile(path_output_ripley,condition,'images',img_name_RC));
         imwrite(flip(flip(img_GC,1),2),fullfile(path_output_ripley,condition,'images',img_name_GC));
