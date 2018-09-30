@@ -27,6 +27,9 @@ fix_rng = 0; % 1 to fix random number generator (for reproducible results)
 % nfeatures = 2 and 3)
 nfeatures = 3;
 
+% 1 to display ROIs that were classified as compact or disperse
+display_gallery = 1;
+
 
 %% 1) Prepare dataset
 
@@ -114,7 +117,7 @@ X_test_with_best_features = X_test(:,fs);
 % Let model predict labels of test data
 y_test_predicted = predict(SVMModel, X_test_with_best_features);
 
-% Calculate accurcay with which model can predict labels
+% Calculate accuracy with which model can predict labels
 accuracy = sum(y_test_predicted == y_test)/length(y_test)*100;
 disp(['Model predicted the right label ' num2str(accuracy) '% of the time.'])
 
@@ -185,4 +188,44 @@ elseif nfeatures == 3
     title({'Test data (predicted labels)','red = compact; blue = disperse'})
     set(gca,'fontsize',14);
 
+end
+
+%% Display regions that were classified as compact or disperse
+
+if display_gallery
+    
+    % Get list of sampleIDs and synaptosomeIDs of test data 
+    sampleID_test = data.sampleID(rand_num);
+    synaptosomeID_test = data.synaptosomeID(rand_num);
+
+    % Get list of sampleIDs and synaptosomeIDs of test data that were
+    % classified as 'compact'
+    sampleID_compact = sampleID_test(y_test_predicted==0);
+    synaptosomeID_compact = synaptosomeID_test(y_test_predicted==0);
+    % Get filenames for the three channels
+    FileNames_RC_compact = cell(length(sampleID_compact),1);
+    FileNames_GC_compact = cell(length(sampleID_compact),1);
+    FileNames_BC_compact = cell(length(sampleID_compact),1);
+    for i = 1:length(sampleID_compact)
+        FileNames_RC_compact{i} = strcat(sampleID_compact(i),'_RC_synaptosome_',num2str(synaptosomeID_compact(i)),'.png');
+        FileNames_GC_compact{i} = strcat(sampleID_compact(i),'_GC_synaptosome_',num2str(synaptosomeID_compact(i)),'.png');
+        FileNames_BC_compact{i} = strcat(sampleID_compact(i),'_BC_synaptosome_',num2str(synaptosomeID_compact(i)),'.png');
+    end
+    
+    % Get list of sampleIDs and synaptosomeIDs of test data that were
+    % classified as 'disperse'
+    sampleID_disperse = sampleID_test(y_test_predicted==1);
+    synaptosomeID_disperse = synaptosomeID_test(y_test_predicted==1);
+    % Get filenames for the three channels
+    FileNames_RC_disperse = cell(length(sampleID_disperse),1);
+    FileNames_GC_disperse = cell(length(sampleID_disperse),1);
+    FileNames_BC_disperse = cell(length(sampleID_disperse),1);
+    for i = 1:length(sampleID_disperse)
+        FileNames_RC_disperse{i} = strcat(sampleID_disperse(i),'_RC_synaptosome_',num2str(synaptosomeID_disperse(i)),'.png');
+        FileNames_GC_disperse{i} = strcat(sampleID_disperse(i),'_GC_synaptosome_',num2str(synaptosomeID_disperse(i)),'.png');
+        FileNames_BC_disperse{i} = strcat(sampleID_disperse(i),'_BC_synaptosome_',num2str(synaptosomeID_disperse(i)),'.png');
+    end
+
+    % Visualize 
+    
 end
