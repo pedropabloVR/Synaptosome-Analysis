@@ -37,7 +37,6 @@ function img = generateImage(X,Y,sigma,intensity,Fov,pixelsize,magnification)
 
 % Get size of Fov
 Fov = ceil((Fov*pixelsize)/magnification) + 1;
-%Fov = ceil((Fov*pixelsize)/magnification);
 
 % Create black image with size Fov
 img = zeros(Fov,Fov);
@@ -56,12 +55,13 @@ for i=1:size(X,1)
     img(idx_x,idx_y) =+ intensity(i);
 end
 
-% % Apply gaussian smoothing
+% % Apply gaussian smoothing (later versions of matlab)
 % img = imgaussfilt(img,sigma/magnification);
 % if image is larger than specified FOV, crop it out 
 
 img = img(1:end,1:Fov);
 
+% Apply gaussian smoothing (works for early versions of matlab)
 H = fspecial('gaussian',round(3*sigma/magnification),sigma/magnification);
 img = imfilter(img,H,'replicate'); 
 

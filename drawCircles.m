@@ -1,9 +1,8 @@
 % This function reads in an image and a list of coordinates and draws
 % circles with specified radius and colour on the image around the
-% coordinates.
-% There are built-in MATLAB functions for this, but if you have a really
-% old version of MATLAB or don't have the computer vision toolbox, this
-% function is an ok alternative.
+% coordinates. There are built-in MATLAB functions for this, but if you
+% have a really old version of MATLAB or don't have the computer vision
+% toolbox, this function is an ok alternative.
 % 
 % INPUT:
 %     img......: rgb image
@@ -14,10 +13,10 @@
 % OUTPUT:
 %     img......: rgb image with circles drawn on it
 % 
-% Based on https://uk.mathworks.com/matlabcentral/fileexchange/39190-draw-a-circle-on-given-image-with-radius
-% from Anand Abhishek Singh
-% Modified by Ezra Bruggeman to draw multiple circles on an image in any
-% colour.
+% Based on:
+% https://uk.mathworks.com/matlabcentral/fileexchange/39190-draw-a-circle-on-given-image-with-radius
+% from Anand Abhishek Singh Modified by Ezra Bruggeman to draw multiple
+% circles on an image in any colour.
 % 
 % Last updated on 16 Sept 2018
 

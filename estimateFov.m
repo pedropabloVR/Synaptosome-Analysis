@@ -1,3 +1,10 @@
+% This function estimates the FOV of a SMLM image using the localisations
+% and pixelsize. It assumes that there is at least one localisation close
+% to the borders of the image.
+% 
+% Author: Ezra Bruggeman, Laser Analytics Group
+% Last updated on 28 Sept 2018
+
 function Fov = estimateFov(X,pixelsize)
 
 X = X/pixelsize;
