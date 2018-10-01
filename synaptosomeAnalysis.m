@@ -16,11 +16,11 @@ tic
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egtak\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_phys\reconstructions\Registered_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_egta\reconstructions\Registered_data';
-directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_egtak\reconstructions\Registered_data';
+directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\egtak\output_reconstructions\Registered_data';
 
 % path to folder where outputfolder will be created (if doesn't already exist)
 %output_dir = 'F:\Data\Synaptosomes\Experiment_37C';
-output_dir = 'F:\Data\Synaptosomes\Experiment_4C';
+output_dir = 'E:\Experiments\synaptosomes\analysis_2ndRound';
 
 condition = 'egtak';
 

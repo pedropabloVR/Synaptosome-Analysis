@@ -7,9 +7,9 @@ clc
 % dir_EGTA  = 'F:\Data\Synaptosomes\Experiment_37C\Results\Results_egta';
 % dir_EGTAK = 'F:\Data\Synaptosomes\Experiment_37C\Results\Results_egtak';
 
-dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_phys';
-dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egta';
-dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egtak';
+dir_PHYS  = 'E:\Experiments\synaptosomes\analysis_2ndRound\Results_phys';
+dir_EGTA  = 'E:\Experiments\synaptosomes\analysis_2ndRound\Results_egta';
+dir_EGTAK = 'E:\Experiments\synaptosomes\analysis_2ndRound\Results_egtak';
 
 % dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_phys';
 % dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egta';
@@ -17,7 +17,7 @@ dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_e
 
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results';
 %output_dir = 'F:\Dump';
-output_dir = '/Volumes/WD Ezra/Dump';
+output_dir = 'E:\Experiments\synaptosomes\analysis_2ndRound\';
 
 
 format = 'thunderstorm';

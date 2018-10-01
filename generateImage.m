@@ -58,6 +58,9 @@ end
 
 % % Apply gaussian smoothing
 % img = imgaussfilt(img,sigma/magnification);
+% if image is larger than specified FOV, crop it out 
+
+img = img(1:end,1:Fov);
 
 H = fspecial('gaussian',round(3*sigma/magnification),sigma/magnification);
 img = imfilter(img,H,'replicate'); 

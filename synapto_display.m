@@ -18,13 +18,13 @@
 %% Load raw synaptosome reconstructions 
 clear all
 close all
-Path = 'E:\Experiments\synaptosomes\Results synaptosome_3rd_4th_rounds\Experiment_37C\Results\Results_combined\ripley\egta\images';
+Path = 'E:\Experiments\synaptosomes\analysis_2ndRound\Results_combined\ripley\phys\images';
 
 % select area token and label token for your data files
 
-RC_token = '_egta_RC_synaptosome_';
-GC_token = '_egta_GC_synaptosome_';
-BC_token = '_egta_BC_synaptosome_';
+RC_token = '_phys_RC_synaptosome_';
+GC_token = '_phys_GC_synaptosome_';
+BC_token = '_phys_BC_synaptosome_';
 
 [PathNameRC, FileNames_RC] = GetImages(Path, RC_token );
 [PathNameGC, FileNames_GC] = GetImages(Path, GC_token );
