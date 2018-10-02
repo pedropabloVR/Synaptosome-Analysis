@@ -19,13 +19,18 @@ dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_e
 %output_dir = 'F:\Dump';
 output_dir = '/Volumes/WD Ezra/Dump';
 
-
 format = 'thunderstorm';
 magnification = 10;
 
 imgtype = '_reconstruction_RGB.tif'; % image to mark detected synaptosomes on with circles
 radius = 100; % radius of the circles
 colour = [100 100 100]; % colour of the circles (triplet)
+
+% Parameters for filtering on overlap between channels to detect synaptosomes
+filterOverlapGreen = 0;  % 1 to filter on overlap between red and green to detect synaptosomes
+filterOverlapBlue  = 1;  % 1 to filter on overlap between red and blue  to detect synaptosomes
+minOverlapGreen    = 0;  % minimum overlap between red and green to detect synaptosomes
+minOverlapBlue     = 20; % minimum overlap between red and green to detect synaptosomes
 
 r_step = 10;
 R_max = 1000;
@@ -236,14 +241,19 @@ writetable(results_combined,path_results_combined,'Delimiter','\t');
 % results for red blobs that don't show significant overlap with the green
 % channel.
 
-results_PHYS  = results_PHYS(results_PHYS.OverlapWithGreen   > 0,:);
-results_EGTA  = results_EGTA(results_EGTA.OverlapWithGreen   > 0,:);
-results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithGreen > 0,:);
+if filterOverlapGreen
+    
+    results_PHYS  = results_PHYS(results_PHYS.OverlapWithGreen   > minOverlapGreen,:);
+    results_EGTA  = results_EGTA(results_EGTA.OverlapWithGreen   > minOverlapGreen,:);
+    results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithGreen > minOverlapGreen,:);
 
-results_PHYS  = results_PHYS(results_PHYS.OverlapWithBlue   > 20,:);
-results_EGTA  = results_EGTA(results_EGTA.OverlapWithBlue   > 20,:);
-results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithBlue > 20,:);
+elseif filterOverlapBlue
 
+    results_PHYS  = results_PHYS(results_PHYS.OverlapWithBlue   > minOverlapBlue,:);
+    results_EGTA  = results_EGTA(results_EGTA.OverlapWithBlue   > minOverlapBlue,:);
+    results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithBlue > minOverlapBlue,:);
+
+end
 
 %% Ripley's K analysis
 
