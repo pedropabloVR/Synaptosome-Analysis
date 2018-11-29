@@ -14,9 +14,7 @@ tic
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_phys\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egta\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egtak\reconstructions\Registered_data\Curated_data';
-%directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_phys\reconstructions\Registered_data';
-%directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_egta\reconstructions\Registered_data';
-directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_egtak\reconstructions\Registered_data';
+directory = fullfile(pwd,'testdata/Data/phys');
 
 % path to folder where outputfolder will be created (if doesn't already exist)
 %output_dir = 'F:\Data\Synaptosomes\Experiment_37C';
@@ -60,10 +58,6 @@ essence = 0; % 1 to only write away files essential for further analysis
 warning('off','images:initSize:adjustingMag');
 warning('off','MATLAB:MKDIR:DirectoryExists');
 
-
-max_radius_RC = max_radius_RC/magnification;
-max_radius_GC = max_radius_GC/magnification;
-max_radius_BC = max_radius_BC/magnification;
 
 %% Creating output folder and parameter file
 
@@ -275,6 +269,10 @@ for i = 1:size(filelist,1)
     % parameters, the minimum number of localisations within this radius
     % was chosen to be 500. The variables containing the unfiltered
     % localisations are cleared after filtering to save memory.
+    
+    max_radius_RC = max_radius_RC/magnification;
+    max_radius_GC = max_radius_GC/magnification;
+    max_radius_BC = max_radius_BC/magnification;
     
     % Density filtering red channel -------------------------------------------
     if max_radius_RC ~= 0 && min_nr_locs_RC ~= 0
