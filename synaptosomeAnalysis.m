@@ -18,9 +18,10 @@ directory = fullfile(pwd,'testdata/Data/phys');
 
 % path to folder where outputfolder will be created (if doesn't already exist)
 %output_dir = 'F:\Data\Synaptosomes\Experiment_37C';
-output_dir = 'F:\Data\Synaptosomes\Experiment_4C';
+%output_dir = 'F:\Data\Synaptosomes\Experiment_4C';
+output_dir = fullfile(pwd,'testdata');
 
-condition = 'egtak';
+condition = 'phys';
 
 channel_token_RC = '_647';
 channel_token_GC = '_561_reg';
@@ -81,8 +82,12 @@ end
 save(fullfile(path_output,'parameters.mat'));
 
 % Get list of locfiles of red channel
-filelist = dir([directory strcat('\*',channel_token_RC,'.csv')]);
-
+if ismac
+    filelist = dir([directory strcat('/*',channel_token_RC,'.csv')]);
+elseif ispc 
+    filelist = dir([directory strcat('\*',channel_token_RC,'.csv')]);
+end
+    
 for i = 1:size(filelist,1)
     
     % Get filenames
@@ -159,21 +164,27 @@ for i = 1:size(filelist,1)
     if filter
         % Filtering red channel ---------------------------------------------------
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.frame       > 500 ,:);
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       > 40  ,:);
+        if ~strcmp(format,'rapidstorm')
+            locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   > 40  ,:);
+        end
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       < 400 ,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.intensity   > 1000,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty < 40  ,:);
         
         % Filtering green channel -------------------------------------------------
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > 500,:);
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       > 40 ,:);
+        if ~strcmp(format,'rapidstorm')
+            locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   > 40  ,:);
+        end
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       < 400,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.intensity   > 500,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty < 40 ,:);
         
         % Filtering blue channel --------------------------------------------------
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > 500,:);
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       > 40 ,:);
+        if ~strcmp(format,'rapidstorm')
+            locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   > 40  ,:);
+        end
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       < 400,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.intensity   > 500,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty < 40 ,:);
