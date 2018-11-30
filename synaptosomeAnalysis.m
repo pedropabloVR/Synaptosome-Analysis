@@ -427,7 +427,7 @@ for i = 1:size(filelist,1)
         imshow(flip(flip(mask_RC,2),1));
         title(sprintf('Red channel after bwareaopen (P = %d)', P_RC));
     end
-    if ~essence;
+    if ~essence
         filename = strcat(area_token,'_detected_synaptosomes.tif');
         imwrite(flip(flip(mask_RC,2),1), fullfile(path_output,filename));
     end
@@ -493,100 +493,104 @@ for i = 1:size(filelist,1)
     disp([num2str(numberOfClusters) ' potential synaptosomes detected.']); disp(' ');
     fprintf(summary_file,'%d potential synaptosomes detected.\n',numberOfClusters);
     
-    % Get centroids of the synaptosomes
-    synaptosomeMeasurements = regionprops(mask_RC_labeled,mask_RC_labeled,'all');
-    centroids = [synaptosomeMeasurements.Centroid];
-    x_centroid = centroids(1:2:end-1);
-    y_centroid = centroids(2:2:end);
+    if numberOfClusters > 0
     
-    % Get area of the synaptosomes
-    areas = [synaptosomeMeasurements.Area];
-    % areas = areas*(magnification^2); % correct here for magnification factor, or do it later in analysis
-    
-    % Loop over detected synaptosomes and calculate their overlap with clusters
-    % in the green and blue channel as a percentage, and a weighted overlap
-    % using the image intensities
-    overlap_perc_GC = zeros(1,numberOfClusters);
-    overlap_perc_BC = zeros(1,numberOfClusters);
-    
-    weighted_overlap_GC = zeros(1,numberOfClusters);
-    weighted_overlap_BC = zeros(1,numberOfClusters);
-    
-    for j = 1:numberOfClusters
-        
-        disp(['Synaptosome ' num2str(j) '/' num2str(numberOfClusters)]);
-        
-        % Get mask for current synaptosome only
-        maskCurrentSynaptosome = mask_RC_labeled;
-        maskCurrentSynaptosome(maskCurrentSynaptosome~=j) = 0;
-        maskCurrentSynaptosome(maskCurrentSynaptosome==j) = 1;
-        
-        % Calculate percentage area overlap with green channel
-        overlap_with_GC_mask = and(logical(mask_GC),logical(maskCurrentSynaptosome));
-        overlap_with_GC = (sum(overlap_with_GC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
-        overlap_perc_GC(j) = overlap_with_GC;
-        disp([num2str(overlap_with_GC) '% overlap with green channel.']);
-        
-        % Calculate percentage area overlap with blue channel
-        overlap_with_BC_mask = and(logical(mask_BC),logical(maskCurrentSynaptosome));
-        overlap_with_BC = (sum(overlap_with_BC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
-        overlap_perc_BC(j) = overlap_with_BC;
-        disp([num2str(overlap_with_BC) '% overlap with blue channel.']);
-        
-        % Apply mask to all channels
-        masked_red_SR_img   = logical(maskCurrentSynaptosome).*double(img_RC);
-        masked_green_SR_img = logical(mask_GC).*double(img_GC);
-        masked_blue_SR_img  = logical(mask_BC).*double(img_BC);
-        
-        % Get weighted overlap for red and green channel
-        X = getColocCoefficient(masked_red_SR_img,masked_green_SR_img);
-        weighted_overlap_GC(j) = X.mandersCoeff;
-        
-        % Get weighted overlap for red and green channel
-        X = getColocCoefficient(masked_red_SR_img,masked_blue_SR_img);
-        weighted_overlap_BC(j) = X.mandersCoeff;
-        disp(' ');
+        % Get centroids of the synaptosomes
+        synaptosomeMeasurements = regionprops(mask_RC_labeled,mask_RC_labeled,'all');
+        centroids = [synaptosomeMeasurements.Centroid];
+        x_centroid = centroids(1:2:end-1);
+        y_centroid = centroids(2:2:end);
+
+        % Get area of the synaptosomes
+        areas = [synaptosomeMeasurements.Area];
+        % areas = areas*(magnification^2); % correct here for magnification factor, or do it later in analysis
+
+        % Loop over detected synaptosomes and calculate their overlap with clusters
+        % in the green and blue channel as a percentage, and a weighted overlap
+        % using the image intensities
+        overlap_perc_GC = zeros(1,numberOfClusters);
+        overlap_perc_BC = zeros(1,numberOfClusters);
+
+        weighted_overlap_GC = zeros(1,numberOfClusters);
+        weighted_overlap_BC = zeros(1,numberOfClusters);
+
+        for j = 1:numberOfClusters
+
+            disp(['Synaptosome ' num2str(j) '/' num2str(numberOfClusters)]);
+
+            % Get mask for current synaptosome only
+            maskCurrentSynaptosome = mask_RC_labeled;
+            maskCurrentSynaptosome(maskCurrentSynaptosome~=j) = 0;
+            maskCurrentSynaptosome(maskCurrentSynaptosome==j) = 1;
+
+            % Calculate percentage area overlap with green channel
+            overlap_with_GC_mask = and(logical(mask_GC),logical(maskCurrentSynaptosome));
+            overlap_with_GC = (sum(overlap_with_GC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
+            overlap_perc_GC(j) = overlap_with_GC;
+            disp([num2str(overlap_with_GC) '% overlap with green channel.']);
+
+            % Calculate percentage area overlap with blue channel
+            overlap_with_BC_mask = and(logical(mask_BC),logical(maskCurrentSynaptosome));
+            overlap_with_BC = (sum(overlap_with_BC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
+            overlap_perc_BC(j) = overlap_with_BC;
+            disp([num2str(overlap_with_BC) '% overlap with blue channel.']);
+
+            % Apply mask to all channels
+            masked_red_SR_img   = logical(maskCurrentSynaptosome).*double(img_RC);
+            masked_green_SR_img = logical(mask_GC).*double(img_GC);
+            masked_blue_SR_img  = logical(mask_BC).*double(img_BC);
+
+            % Get weighted overlap for red and green channel
+            X = getColocCoefficient(masked_red_SR_img,masked_green_SR_img);
+            weighted_overlap_GC(j) = X.mandersCoeff;
+
+            % Get weighted overlap for red and green channel
+            X = getColocCoefficient(masked_red_SR_img,masked_blue_SR_img);
+            weighted_overlap_BC(j) = X.mandersCoeff;
+            disp(' ');
+        end
+
+        % Summarize meaurements in a table
+        synaptosome_ID = 1:numberOfClusters;
+        results = [synaptosome_ID' x_centroid' y_centroid' areas' overlap_perc_GC' overlap_perc_BC' weighted_overlap_GC' weighted_overlap_BC'];
+        results = array2table(results,'VariableNames', {'ID','xCentroid','yCentroid','Area','OverlapWithGreen','OverlapWithBlue','WeightedOverlapWithGreen','WeightedOverlapWithBlue'});
+        filename = char(strcat(area_token,'_results.csv'));
+        writetable(results,fullfile(path_output, filename));
+
+        fclose(summary_file);
+
+        %% Plot results
+
+        % Overlap red and green channel (masks)
+        mask_RC_GC = zeros(size(mask_RC,1),size(mask_RC,2),3);
+        mask_RC_GC(:,:,1) = mask_RC;
+        mask_RC_GC(:,:,2) = mask_GC;
+        if show
+            figure;
+            imshow(flip(flip(mask_RC_GC,2),1));
+            title('Red and green channel','FontSize',15)
+        end
+        if ~essence
+            filename = char(strcat(area_token,'_overlap_green.tif'));
+            imwrite(flip(flip(mask_RC_GC,2),1), fullfile(path_output, filename));
+        end
+
+        % Overlap red and blue channel (masks)
+        mask_RC_BC = zeros(size(mask_RC,1),size(mask_RC,2),3);
+        mask_RC_BC(:,:,1) = mask_RC;
+        mask_RC_BC(:,:,3) = mask_BC;
+        if show
+            figure;
+            imshow(flip(flip(mask_RC_BC,2),1));
+            title('Red and blue channel','FontSize',15);
+        end
+        if ~essence
+            name_mask = char(strcat(area_token,'_overlap_blue.tif'));
+            imwrite(flip(flip(mask_RC_BC,2),1), fullfile(path_output, name_mask));
+        end
+    else
+        continue
     end
-    
-    % Summarize meaurements in a table
-    synaptosome_ID = 1:numberOfClusters;
-    results = [synaptosome_ID' x_centroid' y_centroid' areas' overlap_perc_GC' overlap_perc_BC' weighted_overlap_GC' weighted_overlap_BC'];
-    results = array2table(results,'VariableNames', {'ID','xCentroid','yCentroid','Area','OverlapWithGreen','OverlapWithBlue','WeightedOverlapWithGreen','WeightedOverlapWithBlue'});
-    filename = char(strcat(area_token,'_results.csv'));
-    writetable(results,fullfile(path_output, filename));
-    
-    fclose(summary_file);
-    
-    %% Plot results
-    
-    % Overlap red and green channel (masks)
-    mask_RC_GC = zeros(size(mask_RC,1),size(mask_RC,2),3);
-    mask_RC_GC(:,:,1) = mask_RC;
-    mask_RC_GC(:,:,2) = mask_GC;
-    if show
-        figure;
-        imshow(flip(flip(mask_RC_GC,2),1));
-        title('Red and green channel','FontSize',15)
-    end
-    if ~essence
-        filename = char(strcat(area_token,'_overlap_green.tif'));
-        imwrite(flip(flip(mask_RC_GC,2),1), fullfile(path_output, filename));
-    end
-    
-    % Overlap red and blue channel (masks)
-    mask_RC_BC = zeros(size(mask_RC,1),size(mask_RC,2),3);
-    mask_RC_BC(:,:,1) = mask_RC;
-    mask_RC_BC(:,:,3) = mask_BC;
-    if show
-        figure;
-        imshow(flip(flip(mask_RC_BC,2),1));
-        title('Red and blue channel','FontSize',15);
-    end
-    if ~essence
-        name_mask = char(strcat(area_token,'_overlap_blue.tif'));
-        imwrite(flip(flip(mask_RC_BC,2),1), fullfile(path_output, name_mask));
-    end
-    
 end
 
 toc
