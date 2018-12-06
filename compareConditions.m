@@ -10,11 +10,29 @@ clc
  dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
  dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
 
+<<<<<<< HEAD
 
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results';
 %output_dir = '/Volumes/WD Ezra/Dump';
 %output_dir = fullfile(pwd,'testdata');
 output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
+=======
+% dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_phys';
+% dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egta';
+% dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egtak';
+
+% dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_phys';
+% dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egta';
+% dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egtak';
+
+dir_PHYS  = fullfile(pwd,'testdata/Results_phys');
+dir_EGTA  = fullfile(pwd,'testdata/Results_egta');
+dir_EGTAK = fullfile(pwd,'testdata/Results_egtak');
+
+%output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results';
+%output_dir = '/Volumes/WD Ezra/Dump';
+output_dir = fullfile(pwd,'testdata');
+>>>>>>> upstream/master
 
 format = 'thunderstorm';
 magnification = 10;
@@ -24,6 +42,7 @@ radius = 100; % radius of the circles
 colour = [100 100 100]; % colour of the circles (triplet)
 
 % Parameters for filtering on overlap between channels to detect synaptosomes
+<<<<<<< HEAD
 filterOverlapGreen = 1;  % 1 to filter on overlap between red and green to detect synaptosomes
 filterOverlapBlue  = 1;  % 1 to filter on overlap between red and blue  to detect synaptosomes
 minOverlapGreen    = 10;  % minimum overlap between red and green to detect synaptosomes
@@ -31,6 +50,15 @@ minOverlapBlue     = 10; % minimum overlap between red and green to detect synap
 
 % Minimum distance between two synaptosomes
 min_dist_between_synaptosomes = 300; % in nm
+=======
+filterOverlapGreen = 0;  % 1 to filter on overlap between red and green to detect synaptosomes
+filterOverlapBlue  = 1;  % 1 to filter on overlap between red and blue  to detect synaptosomes
+minOverlapGreen    = 0;  % minimum overlap between red and green to detect synaptosomes
+minOverlapBlue     = 20; % minimum overlap between red and green to detect synaptosomes
+
+% Minimum distance between two synaptosomes
+min_dist_between_synaptosomes = 1500; % in nm
+>>>>>>> upstream/master
 
 r_step = 10;
 R_max = 1000;
@@ -243,6 +271,7 @@ writetable(results_combined,path_results_combined,'Delimiter','\t');
 % results for red blobs that don't show significant overlap with the green
 % channel.
 
+<<<<<<< HEAD
 synapto_number_prefilter_PHYS = size(results_PHYS);
 synapto_number_prefilter_EGTA = size(results_EGTA);
 synapto_number_prefilter_EGTAK = size(results_EGTAK);
@@ -250,11 +279,14 @@ synapto_number_prefilter_EGTAK = size(results_EGTAK);
 
 
 
+=======
+>>>>>>> upstream/master
 if filterOverlapGreen
     
     results_PHYS  = results_PHYS(results_PHYS.OverlapWithGreen   > minOverlapGreen,:);
     results_EGTA  = results_EGTA(results_EGTA.OverlapWithGreen   > minOverlapGreen,:);
     results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithGreen > minOverlapGreen,:);
+<<<<<<< HEAD
 
 elseif filterOverlapBlue
 
@@ -392,7 +424,16 @@ synapto_number_post_proximityFilter_EGTAK = size(results_EGTAK);
 disp(['Synaptosomes PHYS post proximity filter: ' num2str(synapto_number_post_proximityFilter_PHYS(1))]);
 disp(['Synaptosomes EGTA post proximity filter: ' num2str(synapto_number_post_proximityFilter_EGTA(1))]);
 disp(['Synaptosomes EGTAK post proximity filter: ' num2str(synapto_number_post_proximityFilter_EGTAK(1))]);
+=======
 
+elseif filterOverlapBlue
+>>>>>>> upstream/master
+
+    results_PHYS  = results_PHYS(results_PHYS.OverlapWithBlue   > minOverlapBlue,:);
+    results_EGTA  = results_EGTA(results_EGTA.OverlapWithBlue   > minOverlapBlue,:);
+    results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithBlue > minOverlapBlue,:);
+
+end
 
 %% Ripley's K analysis
 
@@ -997,6 +1038,48 @@ results_combined_after_filtering(ismember(results_combined_after_filtering.inter
 results_combined_after_filtering(ismember(results_combined_after_filtering.interclusterdistGB,-1),:)=[];
 
 
+<<<<<<< HEAD
+=======
+%% Remove synaptosomes that are too close together
+
+unique_conditions = unique(results_combined_after_filtering.condition);
+
+% Loop over different conditions in the results
+for i=1:size(unique_conditions)
+    
+    % Get only results of current condition
+    condition_i = unique_conditions{i};
+    results_condition_i = results_combined_after_filtering(...
+        strcmp(results_combined_after_filtering.condition,condition_i),:);
+    
+    % Loop over sample_ID in the results
+    sample_IDs = unique(results_condition_i.sampleID);
+    for j=1:size(sample_IDs,1)
+        sample_ID_j = sample_IDs{j};
+        results_sampleID = results_condition_i(...
+            strcmp(results_condition_i.sampleID,sample_ID_j),:);
+        
+        % Get indeces of synaptosomes in this sample that are too close
+        % together
+        points = [results_sampleID.xCentroid results_sampleID.yCentroid];
+        pairwise_dist_matrix = pdist2(points,points);
+        to_remove = (pairwise_dist_matrix < min_dist_between_synaptosomes) - eye(size(points,1));
+        index_to_remove = sum(to_remove) > 0;
+        disp(['To remove: ' num2str(sum(index_to_remove))]);
+
+        % Remove the synaptosomes that are too close together
+        filtered_results_sampleID = results_sampleID(index_to_remove == 0,:);
+        if ~exist('final_results')
+            final_results = filtered_results_sampleID;
+        else
+            final_results = [final_results; filtered_results_sampleID];
+        end
+    end
+end
+
+results_combined_after_filtering = final_results;
+
+>>>>>>> upstream/master
 %% Save results
 
 path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.mat');
