@@ -1,5 +1,5 @@
-% Author: Ezra Bruggeman, Laser Analytics Group
-% Last updated: 22 Sept 2018
+  % Author: Ezra Bruggeman, Laser Analytics Group
+% Last updated: 04 Dec 2018
 
 
 clear all
@@ -14,13 +14,13 @@ tic
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_phys\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egta\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egtak\reconstructions\Registered_data\Curated_data';
-%directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_phys\reconstructions\Registered_data';
-%directory = 'F:\Data\Synaptosomes\Experiment_4C\Data\thunderSTORM_egta\reconstructions\Registered_data';
+%directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
 directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\egtak\output_reconstructions\Registered_data';
 
 % path to folder where outputfolder will be created (if doesn't already exist)
 %output_dir = 'F:\Data\Synaptosomes\Experiment_37C';
-output_dir = 'E:\Experiments\synaptosomes\analysis_2ndRound';
+%output_dir = 'F:\Data\Synaptosomes\Experiment_4C';
+output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
 
 condition = 'egtak';
 
@@ -29,12 +29,14 @@ channel_token_GC = '_561_reg';
 channel_token_BC = '_488_reg';
 
 format         = 'thunderstorm'; % reconstruction software used (only thunderstorm)
+format_for_filtering = 'rapidstorm';
 pixelsize      = 117; % pixelsize in nm
 magnification  = 10; % value of 10 gives 11.7 nm pixels in reconstruction (if pixelsize camera is 117 nm)
 show           = 0; % 1 to show extra intermediate results
+show_d          = 0;
 
-max_radius_RC  = 2000; % maximum radius of clusters in red channel
-min_nr_locs_RC = 200;  % minimum nr of locs within min_radius_RC from each localistaion in red channel
+max_radius_RC  = 1500; % maximum radius of clusters in red channel
+min_nr_locs_RC = 300;  % minimum nr of locs within min_radius_RC from each localistaion in red channel
 max_radius_GC  = 0;    % maximum radius of clusters in green channel
 min_nr_locs_GC = 0;    % minimum nr of locs within min_radius_GC from each localistaion in green channel
 max_radius_BC  = 0;    % maximum radius of clusters in blue channel
@@ -61,10 +63,6 @@ warning('off','images:initSize:adjustingMag');
 warning('off','MATLAB:MKDIR:DirectoryExists');
 
 
-max_radius_RC = max_radius_RC/magnification;
-max_radius_GC = max_radius_GC/magnification;
-max_radius_BC = max_radius_BC/magnification;
-
 %% Creating output folder and parameter file
 
 % Create new output folder
@@ -85,10 +83,17 @@ end
 
 % Write away workspace variables in a parameter file
 save(fullfile(path_output,'parameters.mat'));
+ max_radius_RC = max_radius_RC/magnification;
+ max_radius_GC = max_radius_GC/magnification;
+ max_radius_BC = max_radius_BC/magnification;
 
 % Get list of locfiles of red channel
-filelist = dir([directory strcat('\*',channel_token_RC,'.csv')]);
-
+if ismac
+    filelist = dir([directory strcat('/*',channel_token_RC,'.csv')]);
+elseif ispc 
+    filelist = dir([directory strcat('\*',channel_token_RC,'.csv')]);
+end
+    
 for i = 1:size(filelist,1)
     
     % Get filenames
@@ -165,21 +170,27 @@ for i = 1:size(filelist,1)
     if filter
         % Filtering red channel ---------------------------------------------------
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.frame       > 500 ,:);
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       > 40  ,:);
+        if ~strcmp(format_for_filtering,'rapidstorm')
+            locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   > 40  ,:);
+        end
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       < 400 ,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.intensity   > 1000,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty < 40  ,:);
         
         % Filtering green channel -------------------------------------------------
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > 500,:);
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       > 40 ,:);
+        if ~strcmp(format_for_filtering,'rapidstorm')
+            locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   > 40  ,:);
+        end
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       < 400,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.intensity   > 500,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty < 40 ,:);
         
         % Filtering blue channel --------------------------------------------------
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > 500,:);
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       > 40 ,:);
+        if ~strcmp(format_for_filtering,'rapidstorm')
+            locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   > 40  ,:);
+        end
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       < 400,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.intensity   > 500,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty < 40 ,:);
@@ -197,9 +208,13 @@ for i = 1:size(filelist,1)
     % Red channel
     X_RC = locs_RC_filtered.x;
     Y_RC = locs_RC_filtered.y;
-    if strcmp(format,'thunderstorm')
-        sigma_RC = median(locs_RC_filtered.sigma)/magnification;
-    elseif strcmp(format,'rapidstorm')
+    if strcmp(format_for_filtering,'thunderstorm')
+        if (locs_RC_filtered.sigma == 0)
+            sigma_RC = sigma_kernel;
+        else
+            sigma_RC = median(locs_RC_filtered.sigma)/magnification;
+        end 
+    elseif strcmp(format_for_filtering,'rapidstorm')
         sigma_RC = sigma_kernel;
     end
     %sigma_RC = sigma_kernel;
@@ -213,7 +228,11 @@ for i = 1:size(filelist,1)
     X_GC = locs_GC_filtered.x;
     Y_GC = locs_GC_filtered.y;
     if strcmp(format,'thunderstorm')
-        sigma_GC = median(locs_GC_filtered.sigma)/magnification;
+         if (locs_GC_filtered.sigma == 0)
+            sigma_GC = sigma_kernel;
+        else
+            sigma_GC = median(locs_GC_filtered.sigma)/magnification;
+        end 
     elseif strcmp(format,'rapidstorm')
         sigma_GC = sigma_kernel;
     end
@@ -228,7 +247,11 @@ for i = 1:size(filelist,1)
     X_BC = locs_BC_filtered.x;
     Y_BC = locs_BC_filtered.y;
     if strcmp(format,'thunderstorm')
-        sigma_BC = median(locs_BC_filtered.sigma)/magnification;
+         if (locs_BC_filtered.sigma == 0)
+            sigma_BC = sigma_kernel;
+        else
+            sigma_BC = median(locs_BC_filtered.sigma)/magnification;
+        end 
     elseif strcmp(format,'rapidstorm')
         sigma_BC = sigma_kernel;
     end
@@ -276,15 +299,17 @@ for i = 1:size(filelist,1)
     % was chosen to be 500. The variables containing the unfiltered
     % localisations are cleared after filtering to save memory.
     
+   
+    
     % Density filtering red channel -------------------------------------------
     if max_radius_RC ~= 0 && min_nr_locs_RC ~= 0
         % Perform density filtering
         [locs_RC_density_filtered,indeces_RC,~] = ...
             nearestNeighbourDensityFilter([locs_RC_filtered.x locs_RC_filtered.y], ...
-            max_radius_RC,min_nr_locs_RC,show); disp(' ');
+            max_radius_RC,min_nr_locs_RC,show_d); disp(' ');
         if isempty(locs_RC_density_filtered)
             disp('All localizations in the red channel were filtered out during density filtering!');
-            return
+            continue
         else
             nr_locs_before = size(locs_RC_filtered.x,1);
             nr_locs_after  = size(locs_RC_density_filtered,1);
@@ -293,9 +318,9 @@ for i = 1:size(filelist,1)
         % Generate image from filtered localizations
         X_RC = locs_RC_density_filtered(:,1);
         Y_RC = locs_RC_density_filtered(:,2);
-        if strcmp(format,'thunderstorm')
+        if strcmp(format_for_filtering,'thunderstorm')
             sigma_RC = median(locs_RC_filtered.sigma)/magnification;
-        elseif strcmp(format,'rapidstorm')
+        elseif strcmp(format_for_filtering,'rapidstorm')
             sigma_RC = sigma_kernel;
         end
         %sigma_RC = sigma_kernel;
@@ -329,9 +354,9 @@ for i = 1:size(filelist,1)
         % Generate image from filtered localisations
         X_GC = locs_GC_density_filtered(:,1);
         Y_GC = locs_GC_density_filtered(:,2);
-        if strcmp(format,'thunderstorm')
+        if strcmp(format_for_filtering,'thunderstorm')
             sigma_GC = median(locs_GC_filtered.sigma)/magnification;
-        elseif strcmp(format,'rapidstorm')
+        elseif strcmp(format_for_filtering,'rapidstorm')
             sigma_GC = sigma_kernel;
         end
         %sigma_GC = sigma_kernel;
@@ -365,9 +390,9 @@ for i = 1:size(filelist,1)
         % Generate image from filtered localizations
         X_BC = locs_BC_density_filtered(:,1);
         Y_BC = locs_BC_density_filtered(:,2);
-        if strcmp(format,'thunderstorm')
+        if strcmp(format_for_filtering,'thunderstorm')
             sigma_BC = median(locs_BC_filtered.sigma)/magnification;
-        elseif strcmp(format,'rapidstorm')
+        elseif strcmp(format_for_filtering,'rapidstorm')
             sigma_BC = sigma_kernel;
         end
         %sigma_BC = sigma_kernel;
@@ -418,7 +443,7 @@ for i = 1:size(filelist,1)
         imshow(flip(flip(mask_RC,2),1));
         title(sprintf('Red channel after bwareaopen (P = %d)', P_RC));
     end
-    if ~essence;
+    if ~essence
         filename = strcat(area_token,'_detected_synaptosomes.tif');
         imwrite(flip(flip(mask_RC,2),1), fullfile(path_output,filename));
     end
@@ -484,100 +509,106 @@ for i = 1:size(filelist,1)
     disp([num2str(numberOfClusters) ' potential synaptosomes detected.']); disp(' ');
     fprintf(summary_file,'%d potential synaptosomes detected.\n',numberOfClusters);
     
-    % Get centroids of the synaptosomes
-    synaptosomeMeasurements = regionprops(mask_RC_labeled,mask_RC_labeled,'all');
-    centroids = [synaptosomeMeasurements.Centroid];
-    x_centroid = centroids(1:2:end-1);
-    y_centroid = centroids(2:2:end);
+    if numberOfClusters > 0
     
-    % Get area of the synaptosomes
-    areas = [synaptosomeMeasurements.Area];
-    % areas = areas*(magnification^2); % correct here for magnification factor, or do it later in analysis
-    
-    % Loop over detected synaptosomes and calculate their overlap with clusters
-    % in the green and blue channel as a percentage, and a weighted overlap
-    % using the image intensities
-    overlap_perc_GC = zeros(1,numberOfClusters);
-    overlap_perc_BC = zeros(1,numberOfClusters);
-    
-    weighted_overlap_GC = zeros(1,numberOfClusters);
-    weighted_overlap_BC = zeros(1,numberOfClusters);
-    
-    for j = 1:numberOfClusters
+        % Get centroids of the synaptosomes
+        synaptosomeMeasurements = regionprops(mask_RC_labeled,mask_RC_labeled,'all');
+        centroids = [synaptosomeMeasurements.Centroid];
+        x_centroid = centroids(1:2:end-1);
+        y_centroid = centroids(2:2:end);
+
+        % Get area of the synaptosomes
+        areas = [synaptosomeMeasurements.Area];
+        % areas = areas*(magnification^2); % correct here for magnification factor, or do it later in analysis
+
+        % Loop over detected synaptosomes and calculate their overlap with clusters
+        % in the green and blue channel as a percentage, and a weighted overlap
+        % using the image intensities
+        overlap_perc_GC = zeros(1,numberOfClusters);
+        overlap_perc_BC = zeros(1,numberOfClusters);
+
+        weighted_overlap_GC = zeros(1,numberOfClusters);
+        weighted_overlap_BC = zeros(1,numberOfClusters);
+
+        for j = 1:numberOfClusters
+
+            disp(['Synaptosome ' num2str(j) '/' num2str(numberOfClusters)]);
+
+            % Get mask for current synaptosome only
+            maskCurrentSynaptosome = mask_RC_labeled;
+            maskCurrentSynaptosome(maskCurrentSynaptosome~=j) = 0;
+            maskCurrentSynaptosome(maskCurrentSynaptosome==j) = 1;
+
+            % Calculate percentage area overlap with green channel
+            overlap_with_GC_mask = and(logical(mask_GC),logical(maskCurrentSynaptosome));
+            overlap_with_GC = (sum(overlap_with_GC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
+            overlap_perc_GC(j) = overlap_with_GC;
+            disp([num2str(overlap_with_GC) '% overlap with green channel.']);
+
+            % Calculate percentage area overlap with blue channel
+            overlap_with_BC_mask = and(logical(mask_BC),logical(maskCurrentSynaptosome));
+            overlap_with_BC = (sum(overlap_with_BC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
+            overlap_perc_BC(j) = overlap_with_BC;
+            disp([num2str(overlap_with_BC) '% overlap with blue channel.']);
+
+            % Apply mask to all channels
+            masked_red_SR_img   = logical(maskCurrentSynaptosome).*double(img_RC);
+            masked_green_SR_img = logical(mask_GC).*double(img_GC);
+            masked_blue_SR_img  = logical(mask_BC).*double(img_BC);
+
+            % Get weighted overlap for red and green channel
+            X = getColocCoefficient(masked_red_SR_img,masked_green_SR_img);
+            weighted_overlap_GC(j) = X.mandersCoeff;
+
+            % Get weighted overlap for red and green channel
+            X = getColocCoefficient(masked_red_SR_img,masked_blue_SR_img);
+            weighted_overlap_BC(j) = X.mandersCoeff;
+            disp(' ');
+        end
+
+        % Summarize meaurements in a table
+        synaptosome_ID = 1:numberOfClusters;
+        results = [synaptosome_ID' x_centroid' y_centroid' areas' overlap_perc_GC' overlap_perc_BC' weighted_overlap_GC' weighted_overlap_BC'];
+        results = array2table(results,'VariableNames', {'ID','xCentroid','yCentroid','Area','OverlapWithGreen','OverlapWithBlue','WeightedOverlapWithGreen','WeightedOverlapWithBlue'});
+        filename = char(strcat(area_token,'_results.csv'));
+        writetable(results,fullfile(path_output, filename));
+
+        fclose(summary_file);
+        %% Plot results
+
+        % Overlap red and green channel (masks)
+        mask_RC_GC = zeros(size(mask_RC,1),size(mask_RC,2),3);
+        mask_RC_GC(:,:,1) = mask_RC;
+        mask_RC_GC(:,:,2) = mask_GC;
+        if show
+            figure;
+            imshow(flip(flip(mask_RC_GC,2),1));
+            title('Red and green channel','FontSize',15)
+        end
+        if ~essence
+            filename = char(strcat(area_token,'_overlap_green.tif'));
+            imwrite(flip(flip(mask_RC_GC,2),1), fullfile(path_output, filename));
+        end
+
+        % 
         
-        disp(['Synaptosome ' num2str(j) '/' num2str(numberOfClusters)]);
         
-        % Get mask for current synaptosome only
-        maskCurrentSynaptosome = mask_RC_labeled;
-        maskCurrentSynaptosome(maskCurrentSynaptosome~=j) = 0;
-        maskCurrentSynaptosome(maskCurrentSynaptosome==j) = 1;
-        
-        % Calculate percentage area overlap with green channel
-        overlap_with_GC_mask = and(logical(mask_GC),logical(maskCurrentSynaptosome));
-        overlap_with_GC = (sum(overlap_with_GC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
-        overlap_perc_GC(j) = overlap_with_GC;
-        disp([num2str(overlap_with_GC) '% overlap with green channel.']);
-        
-        % Calculate percentage area overlap with blue channel
-        overlap_with_BC_mask = and(logical(mask_BC),logical(maskCurrentSynaptosome));
-        overlap_with_BC = (sum(overlap_with_BC_mask)/sum(logical(maskCurrentSynaptosome)))*100;
-        overlap_perc_BC(j) = overlap_with_BC;
-        disp([num2str(overlap_with_BC) '% overlap with blue channel.']);
-        
-        % Apply mask to all channels
-        masked_red_SR_img   = logical(maskCurrentSynaptosome).*double(img_RC);
-        masked_green_SR_img = logical(mask_GC).*double(img_GC);
-        masked_blue_SR_img  = logical(mask_BC).*double(img_BC);
-        
-        % Get weighted overlap for red and green channel
-        X = getColocCoefficient(masked_red_SR_img,masked_green_SR_img);
-        weighted_overlap_GC(j) = X.mandersCoeff;
-        
-        % Get weighted overlap for red and green channel
-        X = getColocCoefficient(masked_red_SR_img,masked_blue_SR_img);
-        weighted_overlap_BC(j) = X.mandersCoeff;
-        disp(' ');
+        % Overlap red and blue channel (masks)
+        mask_RC_BC = zeros(size(mask_RC,1),size(mask_RC,2),3);
+        mask_RC_BC(:,:,1) = mask_RC;
+        mask_RC_BC(:,:,3) = mask_BC;
+        if show
+            figure;
+            imshow(flip(flip(mask_RC_BC,2),1));
+            title('Red and blue channel','FontSize',15);
+        end
+        if ~essence
+            name_mask = char(strcat(area_token,'_overlap_blue.tif'));
+            imwrite(flip(flip(mask_RC_BC,2),1), fullfile(path_output, name_mask));
+        end
+    else
+        continue
     end
-    
-    % Summarize meaurements in a table
-    synaptosome_ID = 1:numberOfClusters;
-    results = [synaptosome_ID' x_centroid' y_centroid' areas' overlap_perc_GC' overlap_perc_BC' weighted_overlap_GC' weighted_overlap_BC'];
-    results = array2table(results,'VariableNames', {'ID','xCentroid','yCentroid','Area','OverlapWithGreen','OverlapWithBlue','WeightedOverlapWithGreen','WeightedOverlapWithBlue'});
-    filename = char(strcat(area_token,'_results.csv'));
-    writetable(results,fullfile(path_output, filename));
-    
-    fclose(summary_file);
-    
-    %% Plot results
-    
-    % Overlap red and green channel (masks)
-    mask_RC_GC = zeros(size(mask_RC,1),size(mask_RC,2),3);
-    mask_RC_GC(:,:,1) = mask_RC;
-    mask_RC_GC(:,:,2) = mask_GC;
-    if show
-        figure;
-        imshow(flip(flip(mask_RC_GC,2),1));
-        title('Red and green channel','FontSize',15)
-    end
-    if ~essence
-        filename = char(strcat(area_token,'_overlap_green.tif'));
-        imwrite(flip(flip(mask_RC_GC,2),1), fullfile(path_output, filename));
-    end
-    
-    % Overlap red and blue channel (masks)
-    mask_RC_BC = zeros(size(mask_RC,1),size(mask_RC,2),3);
-    mask_RC_BC(:,:,1) = mask_RC;
-    mask_RC_BC(:,:,3) = mask_BC;
-    if show
-        figure;
-        imshow(flip(flip(mask_RC_BC,2),1));
-        title('Red and blue channel','FontSize',15);
-    end
-    if ~essence
-        name_mask = char(strcat(area_token,'_overlap_blue.tif'));
-        imwrite(flip(flip(mask_RC_BC,2),1), fullfile(path_output, name_mask));
-    end
-    
 end
 
 toc

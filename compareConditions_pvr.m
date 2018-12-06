@@ -2,19 +2,26 @@ clear all
 close all
 clc
 
-% dir_PHYS  = 'F:\synaptosomes\Results_phys';
-% dir_EGTA  = 'F:\synaptosomes\Results_egta';
-% dir_EGTAK = 'F:\synaptosomes\Results_egtak';
 
- dir_PHYS  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_phys';
- dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
- dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
+% dir_PHYS  = 'F:\Data\Synaptosomes\Experiment_37C\Results\Results_phys';
+% dir_EGTA  = 'F:\Data\Synaptosomes\Experiment_37C\Results\Results_egta';
+% dir_EGTAK = 'F:\Data\Synaptosomes\Experiment_37C\Results\Results_egtak';
 
+% dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_phys';
+% dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egta';
+% dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_37C/Results/Results_egtak';
+
+% dir_PHYS  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_phys';
+% dir_EGTA  = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egta';
+% dir_EGTAK = '/Volumes/WD Ezra/Data/Synaptosomes/Experiment_4C/Results/Results_egtak';
+
+dir_PHYS  = 'F:\synaptosomes\Results_phys';
+dir_EGTA  = 'F:\synaptosomes\Results_egta';
+dir_EGTAK = 'F:\synaptosomes\Results_egtak';
 
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results';
 %output_dir = '/Volumes/WD Ezra/Dump';
-%output_dir = fullfile(pwd,'testdata');
-output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
+output_dir = fullfile('F:\synaptosomes',filesep);
 
 format = 'thunderstorm';
 magnification = 10;
@@ -24,13 +31,13 @@ radius = 100; % radius of the circles
 colour = [100 100 100]; % colour of the circles (triplet)
 
 % Parameters for filtering on overlap between channels to detect synaptosomes
-filterOverlapGreen = 1;  % 1 to filter on overlap between red and green to detect synaptosomes
+filterOverlapGreen = 0;  % 1 to filter on overlap between red and green to detect synaptosomes
 filterOverlapBlue  = 1;  % 1 to filter on overlap between red and blue  to detect synaptosomes
-minOverlapGreen    = 10;  % minimum overlap between red and green to detect synaptosomes
-minOverlapBlue     = 10; % minimum overlap between red and green to detect synaptosomes
+minOverlapGreen    = 0;  % minimum overlap between red and green to detect synaptosomes
+minOverlapBlue     = 20; % minimum overlap between red and green to detect synaptosomes
 
 % Minimum distance between two synaptosomes
-min_dist_between_synaptosomes = 300; % in nm
+min_dist_between_synaptosomes = 500; % in nm
 
 r_step = 10;
 R_max = 1000;
@@ -60,8 +67,6 @@ else
 end
 
 save(fullfile(path_output,'parameters.mat'));
-diary(fullfile(path_output,'command_window_output.txt'));
- 
 %% Read in results of different ROIs and merge them
 
 % PHYS --------------------------------------------------------------------
@@ -243,13 +248,6 @@ writetable(results_combined,path_results_combined,'Delimiter','\t');
 % results for red blobs that don't show significant overlap with the green
 % channel.
 
-synapto_number_prefilter_PHYS = size(results_PHYS);
-synapto_number_prefilter_EGTA = size(results_EGTA);
-synapto_number_prefilter_EGTAK = size(results_EGTAK);
-
-
-
-
 if filterOverlapGreen
     
     results_PHYS  = results_PHYS(results_PHYS.OverlapWithGreen   > minOverlapGreen,:);
@@ -263,136 +261,6 @@ elseif filterOverlapBlue
     results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithBlue > minOverlapBlue,:);
 
 end
-
-synapto_number_post_overlapFilter_PHYS = size(results_PHYS);
-synapto_number_post_overlapFilter_EGTA = size(results_EGTA);
-synapto_number_post_overlapFilter_EGTAK = size(results_EGTAK);
-
-disp(['Synaptosomes PHYS pre filter: ' num2str(synapto_number_prefilter_PHYS(1))]);
-disp(['Synaptosomes PHYS post filter: ' num2str(synapto_number_post_overlapFilter_PHYS(1))]);
-disp(['Synaptosomes EGTA pre filter: ' num2str(synapto_number_prefilter_EGTA(1))]);
-disp(['Synaptosomes EGTA post filter: ' num2str(synapto_number_post_overlapFilter_EGTA(1))]);
-disp(['Synaptosomes EGTAK pre filter: ' num2str(synapto_number_prefilter_EGTAK(1))]);
-disp(['Synaptosomes EGTAK post filter: ' num2str(synapto_number_post_overlapFilter_EGTAK(1))]);
-
-
-%% Remove synaptosomes that are too close together
-
-% Make a copy of the results before the proximity filtering
-% (so only the overlap-filtered results)
-results_PHYS_before_proximity_filter = results_PHYS;
-results_EGTA_before_proximity_filter = results_EGTA;
-results_EGTAK_before_proximity_filter = results_EGTAK;
-
-
-% PHYS condition ----------------------------------------------------------
-
-% Loop over sample_ID in the results
-sample_IDs = unique(results_PHYS.sampleID);
-for i=1:size(sample_IDs,1)
-    
-    % Get synaptosomes from current sample
-    sample_ID_i = sample_IDs{i};
-    results_sampleID = results_PHYS(strcmp(results_PHYS.sampleID,sample_ID_i),:);
-    synaptosome_number_pre_filter = size(results_sampleID.synaptosomeID);
-    
-    % Get indeces of synaptosomes in this sample that are too close together
-    points = [results_sampleID.xCentroid results_sampleID.yCentroid];
-    pairwise_dist_matrix = pdist2(points,points);
-    to_remove = (pairwise_dist_matrix < min_dist_between_synaptosomes) - eye(size(points,1));
-    index_to_remove = sum(to_remove) > 0;
-    disp(['Condition and sample ID: ' sample_ID_i]);
-    disp(['Synaptosomes before proximity filter: ' num2str(synaptosome_number_pre_filter(1))]);
-    disp(['To remove: ' num2str(sum(index_to_remove))]);
-
-    % Remove the synaptosomes that are too close together
-    filtered_results_sampleID = results_sampleID(index_to_remove == 0,:);
-    if ~exist('filtered_results_PHYS')
-        filtered_results_PHYS = filtered_results_sampleID;
-    else
-        filtered_results_PHYS = [filtered_results_PHYS; filtered_results_sampleID];
-    end
-end
-
-results_PHYS = filtered_results_PHYS;
-
-% -------------------------------------------------------------------------
-
-
-% EGTA condition ----------------------------------------------------------
-
-% Loop over sample_ID in the results
-sample_IDs = unique(results_EGTA.sampleID);
-for i=1:size(sample_IDs,1)
-    
-    % Get synaptosomes from current sample
-    sample_ID_i = sample_IDs{i};
-    results_sampleID = results_EGTA(strcmp(results_EGTA.sampleID,sample_ID_i),:);
-    synaptosome_number_pre_filter = size(results_sampleID.synaptosomeID);
-    
-    % Get indeces of synaptosomes in this sample that are too close together
-    points = [results_sampleID.xCentroid results_sampleID.yCentroid];
-    pairwise_dist_matrix = pdist2(points,points);
-    to_remove = (pairwise_dist_matrix < min_dist_between_synaptosomes) - eye(size(points,1));
-    index_to_remove = sum(to_remove) > 0;
-    disp(['Condition and sample ID: ' sample_ID_i]);
-    disp(['Synaptosomes before proximity filter: ' num2str(synaptosome_number_pre_filter(1))]);
-    disp(['To remove: ' num2str(sum(index_to_remove))]);
-
-    % Remove the synaptosomes that are too close together
-    filtered_results_sampleID = results_sampleID(index_to_remove == 0,:);
-    if ~exist('filtered_results_EGTA')
-        filtered_results_EGTA = filtered_results_sampleID;
-    else
-        filtered_results_EGTA = [filtered_results_EGTA; filtered_results_sampleID];
-    end
-end
-
-results_EGTA = filtered_results_EGTA;
-
-% -------------------------------------------------------------------------
-
-% EGTA condition ----------------------------------------------------------
-
-% Loop over sample_ID in the results
-sample_IDs = unique(results_EGTAK.sampleID);
-for i=1:size(sample_IDs,1)
-    
-    % Get synaptosomes from current sample
-    sample_ID_i = sample_IDs{i};
-    results_sampleID = results_EGTAK(strcmp(results_EGTAK.sampleID,sample_ID_i),:);
-    synaptosome_number_pre_filter = size(results_sampleID.synaptosomeID);
-    
-    % Get indeces of synaptosomes in this sample that are too close together
-    points = [results_sampleID.xCentroid results_sampleID.yCentroid];
-    pairwise_dist_matrix = pdist2(points,points);
-    to_remove = (pairwise_dist_matrix < min_dist_between_synaptosomes) - eye(size(points,1));
-    index_to_remove = sum(to_remove) > 0;
-    disp(['Condition and sample ID: ' sample_ID_i]);
-    disp(['Synaptosomes before proximity filter: ' num2str(synaptosome_number_pre_filter(1))]);
-    disp(['To remove: ' num2str(sum(index_to_remove))]);
-
-    % Remove the synaptosomes that are too close together
-    filtered_results_sampleID = results_sampleID(index_to_remove == 0,:);
-    if ~exist('filtered_results_EGTAK')
-        filtered_results_EGTAK = filtered_results_sampleID;
-    else
-        filtered_results_EGTAK = [filtered_results_EGTAK; filtered_results_sampleID];
-    end
-end
-
-results_EGTAK = filtered_results_EGTAK;
-
-% -------------------------------------------------------------------------
-
-synapto_number_post_proximityFilter_PHYS = size(results_PHYS);
-synapto_number_post_proximityFilter_EGTA = size(results_EGTA);
-synapto_number_post_proximityFilter_EGTAK = size(results_EGTAK);
-
-disp(['Synaptosomes PHYS post proximity filter: ' num2str(synapto_number_post_proximityFilter_PHYS(1))]);
-disp(['Synaptosomes EGTA post proximity filter: ' num2str(synapto_number_post_proximityFilter_EGTA(1))]);
-disp(['Synaptosomes EGTAK post proximity filter: ' num2str(synapto_number_post_proximityFilter_EGTAK(1))]);
-
 
 %% Ripley's K analysis
 
@@ -424,6 +292,7 @@ mkdir(fullfile(path_output_ripley,condition,'images'));
 
 % Get sample IDs and loop over them
 sampleIDs = unique(results_PHYS.sampleID);
+count = 0;
 for i = 1:length(sampleIDs)
    
     % Load localisation files of sample
@@ -563,6 +432,7 @@ mkdir(fullfile(path_output_ripley,condition,'images'));
 
 % Get sample IDs and loop over them
 sampleIDs = unique(results_EGTA.sampleID);
+count = 0;
 for i = 1:length(sampleIDs)
    
     % Load localisation files of sample
@@ -700,6 +570,7 @@ mkdir(fullfile(path_output_ripley,condition,'images'));
 
 % Get sample IDs and loop over them
 sampleIDs = unique(results_EGTAK.sampleID);
+count = 0;
 for i = 1:length(sampleIDs)
    
     % Load localisation files of sample
@@ -997,6 +868,47 @@ results_combined_after_filtering(ismember(results_combined_after_filtering.inter
 results_combined_after_filtering(ismember(results_combined_after_filtering.interclusterdistGB,-1),:)=[];
 
 
+%% Remove synaptosomes that are too close together
+
+unique_conditions = unique(results_combined_after_filtering.condition);
+
+% Loop over different conditions in the results
+for i=1:size(unique_conditions)
+    
+    % Get only results of current condition
+    condition_i = unique_conditions{i};
+    results_condition_i = results_combined_after_filtering(...
+        strcmp(results_combined_after_filtering.condition,condition_i),:);
+    
+    % Loop over sample_ID in the results
+    sample_IDs = unique(results_condition_i.sampleID);
+    for j=1:size(sample_IDs,1)
+        sample_ID_j = sample_IDs{j};
+        results_sampleID = results_condition_i(...
+            strcmp(results_condition_i.sampleID,sample_ID_j),:);
+        synaptosome_number_pre_filter = size(results_sampleID.synaptosomeID);
+        % Get indeces of synaptosomes in this sample that are too close
+        % together
+        points = [results_sampleID.xCentroid results_sampleID.yCentroid];
+        pairwise_dist_matrix = pdist2(points,points);
+        to_remove = (pairwise_dist_matrix < min_dist_between_synaptosomes) - eye(size(points,1));
+        index_to_remove = sum(to_remove) > 0;
+        disp(['Condition and sample ID: ' sample_ID_j]);
+        disp(['Synaptosomes before proximity filter: ' num2str(synaptosome_number_pre_filter(1))]);
+        disp(['To remove: ' num2str(sum(index_to_remove))]);
+
+        % Remove the synaptosomes that are too close together
+        filtered_results_sampleID = results_sampleID(index_to_remove == 0,:);
+        if ~exist('final_results')
+            final_results = filtered_results_sampleID;
+        else
+            final_results = [final_results; filtered_results_sampleID];
+        end
+    end
+end
+
+results_combined_after_filtering = final_results;
+
 %% Save results
 
 path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.mat');
@@ -1006,10 +918,13 @@ path_results_combined = fullfile(path_output,'results_combined_after_overlap_thr
 writetable(results_combined_after_filtering,path_results_combined,'Delimiter','\t');
 
 
+
 %% Mark detected synaptosomes on three-colour reconstructions
 
 path_detected = fullfile(path_output,'detected_synaptosomes');
 mkdir(path_detected);
+
+
 
 % PHYS condition
 results_PHYS = results_combined_after_filtering(...
@@ -1034,6 +949,64 @@ for i = 1:length(sampleIDs)
     if show; figure; imshow(img); end
     img_name = strcat(char(currentSample),'_detected.png');
     if flagprint; imwrite(img, fullfile(path_detected,img_name)); end
+    
+    
+    % Print individual cropped synaptosome image
+      % Load localisation files of sample
+
+    % Get number of synaptosomes and coordinates of their centroids
+    synaptosomeID = results_PHYS_i.synaptosomeID;
+    num_synaptosomes = size(results_PHYS_i,1);
+    X_c = results_PHYS_i.xCentroid;
+    Y_c = results_PHYS_i.yCentroid;
+    
+     % Loop over all synaptosomes
+    for j = 1:num_synaptosomes
+        
+        % Get coordinates of synaptosome
+        x_c = X_c(j)*magnification;
+        y_c = Y_c(j)*magnification;
+
+        % Crop locfiles to region around synaptosome
+        locs_RC_cropped = cropLocsAroundCentroid(locs_RC,x_c,y_c,(windowsize/magnification)*pixelsize);
+        locs_GC_cropped = cropLocsAroundCentroid(locs_GC,x_c,y_c,(windowsize/magnification)*pixelsize);
+        locs_BC_cropped = cropLocsAroundCentroid(locs_BC,x_c,y_c,(windowsize/magnification)*pixelsize);
+        
+        % Write away cropped localisation files
+        writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
+        
+        X_RC = locs_RC_cropped.x;
+        Y_RC = locs_RC_cropped.y;
+        X_GC = locs_GC_cropped.x;
+        Y_GC = locs_GC_cropped.y;
+        X_BC = locs_BC_cropped.x;
+        Y_BC = locs_BC_cropped.y;
+        
+        % Get images of cropped regions and write them away
+        sigma = 150/magnification;
+        intensities_RC = locs_RC_cropped.intensity;
+        intensities_GC = locs_GC_cropped.intensity;
+        intensities_BC = locs_BC_cropped.intensity;
+        
+        img_RC = generateImage(X_RC-min(X_RC)+1, Y_RC-min(Y_RC)+1, sigma, intensities_RC, windowsize/magnification, pixelsize, magnification);
+        img_GC = generateImage(X_GC-min(X_GC)+1, Y_GC-min(Y_GC)+1, sigma, intensities_GC, windowsize/magnification, pixelsize, magnification);
+        img_BC = generateImage(X_BC-min(X_BC)+1, Y_BC-min(Y_BC)+1, sigma, intensities_BC, windowsize/magnification, pixelsize, magnification);
+        
+        img_name_RC = strcat(char(sampleIDs(i)),'_RC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_GC = strcat(char(sampleIDs(i)),'_GC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        img_name_BC = strcat(char(sampleIDs(i)),'_BC_synaptosome_',num2str(synaptosomeID(j)),'.png');
+        
+        imwrite(flip(flip(img_RC,1),2),fullfile(path_output_ripley,condition,'images',img_name_RC));
+        imwrite(flip(flip(img_GC,1),2),fullfile(path_output_ripley,condition,'images',img_name_GC));
+        imwrite(flip(flip(img_BC,1),2),fullfile(path_output_ripley,condition,'images',img_name_BC));
+        
+
+    end
+    
+    
+    
 end
 
 % EGTA condition
@@ -1085,6 +1058,10 @@ for i = 1:length(sampleIDs)
     img_name = strcat(char(currentSample),'_detected.png');
     if flagprint; imwrite(img, fullfile(path_detected,img_name)); end
 end
+
+%% Here also extract individual cropped images of the detected synaptosomes
+
+
 
 
 %% Plot and compare results from overlap analysis
@@ -1198,9 +1175,6 @@ title({'Unweighted overlap','mCling and a-synuclein'});
 
 if flagprint
     savefig(fig2,fullfile(path_figures_overlap,'unweighted-overlap-mcling-a-synuclein.fig'))
-    % export figure to a pdf for display
-    filename = fullfile(path_figures_overlap,'unweighted-overlap-mcling-a-synuclein');
-    print(fig2,filename,'-dpdf','-r300')
 end
 
 
@@ -1226,8 +1200,6 @@ title({'Unweighted overlap','mCling and VAMP2'});
 
 if flagprint
     savefig(fig3,fullfile(path_figures_overlap,'unweighted-overlap-mcling-vamp2.fig'))
-    filename = fullfile(path_figures_overlap,'unweighted-overlap-mcling-vamp2');
-    print(fig3,filename,'-dpdf','-r300')
 end
 
 
@@ -1253,8 +1225,6 @@ title({'Weighted overlap','mCling and a-synuclein'});
 
 if flagprint
     savefig(fig6,fullfile(path_figures_overlap,'weighted-overlap-mcling-a-synuclein.fig'))
-    filename = fullfile(path_figures_overlap,'weighted-overlap-mcling-a-synuclein');
-    print(fig6,filename,'-dpdf','-r300')
 end
 
 
@@ -1280,9 +1250,8 @@ title({'Weighted overlap','mCling and VAMP2'});
 
 if flagprint
     savefig(fig7,fullfile(path_figures_overlap,'weighted-overlap-mcling-vamp2.fig'))
-    filename = fullfile(path_figures_overlap,'weighted-overlap-mcling-vamp2');
-    print(fig7,filename,'-dpdf','-r300')
 end
+
 
 %% Plot and compare results from Ripley analysis
 
@@ -1571,5 +1540,3 @@ if flagprint
     savefig(fig11,fullfile(path_ripley_curves,'ripley_VAMP2_egtak.fig'))
     savefig(fig12,fullfile(path_ripley_curves,'ripley_VAMP2.fig'))
 end
-
-diary off

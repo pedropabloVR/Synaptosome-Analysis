@@ -57,9 +57,6 @@ end
 
 % % Apply gaussian smoothing (later versions of matlab)
 % img = imgaussfilt(img,sigma/magnification);
-% if image is larger than specified FOV, crop it out 
-
-img = img(1:end,1:Fov);
 
 % Apply gaussian smoothing (works for early versions of matlab)
 H = fspecial('gaussian',round(3*sigma/magnification),sigma/magnification);

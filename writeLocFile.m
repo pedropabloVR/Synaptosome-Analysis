@@ -40,10 +40,10 @@ if strcmp(format,'thunderstorm')
     end
     
 elseif strcmp(format,'rapidstorm')
-    print('Writing away RapidSTORM files is not yet implemented, sorry!')
+    disp('Writing away RapidSTORM files is not yet implemented, sorry!')
     
 else
-    print('Please select a valid format in writeLocFile.')
+    disp('Please select a valid format in writeLocFile.')
     return
 end
 end
