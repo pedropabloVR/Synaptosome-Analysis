@@ -23,7 +23,7 @@ directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\egtak\output_reconstr
 output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
 
 condition = 'egtak';
-
+ 
 channel_token_RC = '_647';
 channel_token_GC = '_561_reg';
 channel_token_BC = '_488_reg';
