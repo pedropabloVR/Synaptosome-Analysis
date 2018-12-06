@@ -10,7 +10,6 @@ clc
  dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
  dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
 
-<<<<<<< HEAD
 
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results';
 %output_dir = '/Volumes/WD Ezra/Dump';
