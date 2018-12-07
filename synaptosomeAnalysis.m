@@ -1,4 +1,4 @@
-  % Author: Ezra Bruggeman, Laser Analytics Group
+% Author: Ezra Bruggeman, Laser Analytics Group
 % Last updated: 04 Dec 2018
 
 
@@ -14,27 +14,19 @@ tic
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_phys\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egta\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egtak\reconstructions\Registered_data\Curated_data';
-<<<<<<< HEAD
+
 %directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
 directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\egtak\output_reconstructions\Registered_data';
-=======
-directory = fullfile(pwd,'testdata/Data/phys');
->>>>>>> upstream/master
+
 
 % path to folder where outputfolder will be created (if doesn't already exist)
 %output_dir = 'F:\Data\Synaptosomes\Experiment_37C';
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C';
-<<<<<<< HEAD
+
 output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
 
 condition = 'egtak';
  
-=======
-output_dir = fullfile(pwd,'testdata');
-
-condition = 'phys';
-
->>>>>>> upstream/master
 channel_token_RC = '_647';
 channel_token_GC = '_561_reg';
 channel_token_BC = '_488_reg';
@@ -181,11 +173,7 @@ for i = 1:size(filelist,1)
     if filter
         % Filtering red channel ---------------------------------------------------
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.frame       > 500 ,:);
-<<<<<<< HEAD
         if ~strcmp(format_for_filtering,'rapidstorm')
-=======
-        if ~strcmp(format,'rapidstorm')
->>>>>>> upstream/master
             locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   > 40  ,:);
         end
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       < 400 ,:);
@@ -194,11 +182,7 @@ for i = 1:size(filelist,1)
         
         % Filtering green channel -------------------------------------------------
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > 500,:);
-<<<<<<< HEAD
         if ~strcmp(format_for_filtering,'rapidstorm')
-=======
-        if ~strcmp(format,'rapidstorm')
->>>>>>> upstream/master
             locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   > 40  ,:);
         end
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       < 400,:);
@@ -207,11 +191,7 @@ for i = 1:size(filelist,1)
         
         % Filtering blue channel --------------------------------------------------
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > 500,:);
-<<<<<<< HEAD
         if ~strcmp(format_for_filtering,'rapidstorm')
-=======
-        if ~strcmp(format,'rapidstorm')
->>>>>>> upstream/master
             locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   > 40  ,:);
         end
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       < 400,:);
@@ -321,14 +301,6 @@ for i = 1:size(filelist,1)
     % parameters, the minimum number of localisations within this radius
     % was chosen to be 500. The variables containing the unfiltered
     % localisations are cleared after filtering to save memory.
-    
-<<<<<<< HEAD
-   
-=======
-    max_radius_RC = max_radius_RC/magnification;
-    max_radius_GC = max_radius_GC/magnification;
-    max_radius_BC = max_radius_BC/magnification;
->>>>>>> upstream/master
     
     % Density filtering red channel -------------------------------------------
     if max_radius_RC ~= 0 && min_nr_locs_RC ~= 0
@@ -603,10 +575,6 @@ for i = 1:size(filelist,1)
         writetable(results,fullfile(path_output, filename));
 
         fclose(summary_file);
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/master
         %% Plot results
 
         % Overlap red and green channel (masks)
@@ -623,12 +591,6 @@ for i = 1:size(filelist,1)
             imwrite(flip(flip(mask_RC_GC,2),1), fullfile(path_output, filename));
         end
 
-<<<<<<< HEAD
-        % 
-        
-        
-=======
->>>>>>> upstream/master
         % Overlap red and blue channel (masks)
         mask_RC_BC = zeros(size(mask_RC,1),size(mask_RC,2),3);
         mask_RC_BC(:,:,1) = mask_RC;
