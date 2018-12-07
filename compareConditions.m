@@ -6,11 +6,11 @@ clc
 % dir_EGTA  = 'F:\synaptosomes\Results_egta';
 % dir_EGTAK = 'F:\synaptosomes\Results_egtak';
 
- dir_PHYS  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_phys';
- dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
- dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
+ dir_PHYS  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205\Results_phys';
+ dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205\Results_egta';
+ dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205\Results_egtak';
 
-output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
+output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205',filesep);
 
 
 format = 'thunderstorm';

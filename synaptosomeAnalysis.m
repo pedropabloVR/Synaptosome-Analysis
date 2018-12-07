@@ -16,7 +16,7 @@ tic
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egtak\reconstructions\Registered_data\Curated_data';
 
 %directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
-directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\egtak\output_reconstructions\Registered_data';
+directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\phys\output_reconstructions\Registered_data';
 
 
 % path to folder where outputfolder will be created (if doesn't already exist)
@@ -25,7 +25,7 @@ directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\egtak\output_reconstr
 
 output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
 
-condition = 'egtak';
+condition = 'phys';
  
 channel_token_RC = '_647';
 channel_token_GC = '_561_reg';
