@@ -16,15 +16,20 @@
 % Updated 28/09/2018
 
 %% Load raw synaptosome reconstructions 
-clear all
+clear all 
 close all
-Path = 'E:\Experiments\synaptosomes\Results synaptosome_3rd_4th_rounds\Experiment_37C\Results\Results_combined\ripley\egta\images';
+
+Path        = 'F:\synaptosomes\Results_combined_20181205_final\ripley\phys\images';
+output_dir  = 'F:\synaptosomes\Results_combined_20181205_final';
+%output_dir  = 'F:\synaptosomes\Results_combined';
 
 % select area token and label token for your data files
-
-RC_token = '_egta_RC_synaptosome_';
-GC_token = '_egta_GC_synaptosome_';
-BC_token = '_egta_BC_synaptosome_';
+condition = 'phys';
+im_cutoff = 20;
+show      = 0;
+RC_token  = ['_' condition '_RC_synaptosome_'];
+GC_token  = ['_' condition '_GC_synaptosome_'];
+BC_token  = ['_' condition '_BC_synaptosome_'];
 
 [PathNameRC, FileNames_RC] = GetImages(Path, RC_token );
 [PathNameGC, FileNames_GC] = GetImages(Path, GC_token );
@@ -48,6 +53,22 @@ green = cell(N_files,1);
 blue = cell(N_files,1);
 imlabel = cell(N_files,1);
 im_names = cell(N_files,1);
+
+
+path_output = fullfile(output_dir, filesep,['Synapto_montage_' condition]);
+if exist(path_output, 'dir')
+    opts.Interpreter = 'tex';
+    opts.Default = 'Continue';
+    quest = '\fontsize{12}An output folder ''Results'' already exists. If you continue, data in this folder might be overwritten.';
+    answer = questdlg(quest,'Message','Cancel','Continue',opts);
+    if strcmp(answer,'Continue')
+        mkdir(path_output);
+    else
+        return
+    end
+else
+    mkdir(path_output);
+end
 
 
 for i = 1: N_files
@@ -74,8 +95,68 @@ for i = 1: N_files
     
 end 
 
-% Display image montage
-figure;imdisp([red green blue overlay imlabel],'Size',[5 N_files],'Border',0.02)
+% cycle through the images, 20 at a time, display them, and then continue
+% with the next 20 until there are none left
 
+% divide arrays into sub-arrays with 20 images each
+remainder = mod(N_files,im_cutoff);
+if remainder >0
+    num_sub_arrays = floor(N_files/im_cutoff)+1;
+else
+    num_sub_arrays = floor(N_files/im_cutoff);
+end 
+
+count = 1;
+if num_sub_arrays == 1
+    remainder = N_files;
+end 
+for j = 1:num_sub_arrays
+    % only on the last count of the loop, if the mod is more than 0, fix
+    if j == num_sub_arrays % on the last run of the loop, run until the end of the number of files 
+        red_j(1:remainder,1)   = red(count:N_files,1);
+        green_j(1:remainder,1) = green(count:N_files,1);
+        blue_j(1:remainder,1)  = blue(count:N_files,1);
+        overlay_j(1:remainder,1)  = overlay(count:N_files,1);
+        imlabel_j(1:remainder,1)  = imlabel(count:N_files,1);
+        h=figure;imdisp([red_j green_j blue_j overlay_j imlabel_j],'Size',[5 remainder],'Border',0.02)
+
+    else
+        red_j(1:im_cutoff,1)   = red(count:j*im_cutoff,1);
+        green_j(1:im_cutoff,1) = green(count:j*im_cutoff,1);
+        blue_j(1:im_cutoff,1)  = blue(count:j*im_cutoff,1);
+        overlay_j(1:im_cutoff,1)  = overlay(count:j*im_cutoff,1);
+        imlabel_j(1:im_cutoff,1)  = imlabel(count:j*im_cutoff,1);
+        count = count+im_cutoff;
+        h=figure;imdisp([red_j green_j blue_j overlay_j imlabel_j],'Size',[5 im_cutoff],'Border',0.02)
+    end 
+    
+    % export figure to a pdf for display
+    set(h,'Units','Inches');
+    pos = get(h,'Position');
+    set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    filename = [condition '_synapto_montage_' num2str(j)];
+    print(h,[path_output filesep filename],'-dpdf','-r300')
+    clear red_j green_j blue_j overlay_j imlabel_j 
+end 
+
+% Display image montage
+%figure;imdisp([red green blue overlay imlabel],'Size',[5 N_files],'Border',0.02)
+% 
+% for j = 1:num_sub_arrays
+%     % only on the last count of the loop, if the mod is more than 0, fix
+%     if j == num_sub_arrays % on the last run of the loop, run until the end of the number of files
+%         red_j(count:N_files,1) = red(count:N_files,1);
+%         green_j(count:N_files,1) = green(count:N_files,1);
+%         blue_j(count:N_files,1) = blue(count:N_files,1);
+%     else
+%         red_j(count:j*im_cutoff,1) = red(count:j*im_cutoff,1);
+%         green_j(count:j*im_cutoff,1) = green(count:j*im_cutoff,1);
+%         blue_j(count:j*im_cutoff,1) = blue(count:j*im_cutoff,1);
+%         count = count+im_cutoff;
+%     end 
+%     
+%     figure;imdisp([red_j green_j blue_j ],'Size',[3 im_cutoff],'Border',0.02)
+% end 
+% 
 
 

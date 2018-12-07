@@ -1,5 +1,5 @@
 % Author: Ezra Bruggeman, Laser Analytics Group
-% Last updated: 22 Sept 2018
+% Last updated: 04 Dec 2018
 
 
 clear all
@@ -14,26 +14,32 @@ tic
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_phys\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egta\reconstructions\Registered_data\Curated_data';
 %directory = 'F:\Data\Synaptosomes\Experiment_37C\Data\thunderSTORM_egtak\reconstructions\Registered_data\Curated_data';
-directory = fullfile(pwd,'testdata/Data/phys');
+
+%directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
+directory = 'E:\Experiments\synaptosomes\raw_data_2ndRound\egtak\output_reconstructions\Registered_data';
+
 
 % path to folder where outputfolder will be created (if doesn't already exist)
 %output_dir = 'F:\Data\Synaptosomes\Experiment_37C';
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C';
-output_dir = fullfile(pwd,'testdata');
 
-condition = 'phys';
+output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
 
+condition = 'egtak';
+ 
 channel_token_RC = '_647';
 channel_token_GC = '_561_reg';
 channel_token_BC = '_488_reg';
 
 format         = 'thunderstorm'; % reconstruction software used (only thunderstorm)
+format_for_filtering = 'rapidstorm';
 pixelsize      = 117; % pixelsize in nm
 magnification  = 10; % value of 10 gives 11.7 nm pixels in reconstruction (if pixelsize camera is 117 nm)
 show           = 0; % 1 to show extra intermediate results
+show_d          = 0;
 
-max_radius_RC  = 2000; % maximum radius of clusters in red channel
-min_nr_locs_RC = 200;  % minimum nr of locs within min_radius_RC from each localistaion in red channel
+max_radius_RC  = 1500; % maximum radius of clusters in red channel
+min_nr_locs_RC = 300;  % minimum nr of locs within min_radius_RC from each localistaion in red channel
 max_radius_GC  = 0;    % maximum radius of clusters in green channel
 min_nr_locs_GC = 0;    % minimum nr of locs within min_radius_GC from each localistaion in green channel
 max_radius_BC  = 0;    % maximum radius of clusters in blue channel
@@ -80,6 +86,9 @@ end
 
 % Write away workspace variables in a parameter file
 save(fullfile(path_output,'parameters.mat'));
+ max_radius_RC = max_radius_RC/magnification;
+ max_radius_GC = max_radius_GC/magnification;
+ max_radius_BC = max_radius_BC/magnification;
 
 % Get list of locfiles of red channel
 if ismac
@@ -164,7 +173,7 @@ for i = 1:size(filelist,1)
     if filter
         % Filtering red channel ---------------------------------------------------
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.frame       > 500 ,:);
-        if ~strcmp(format,'rapidstorm')
+        if ~strcmp(format_for_filtering,'rapidstorm')
             locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   > 40  ,:);
         end
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       < 400 ,:);
@@ -173,7 +182,7 @@ for i = 1:size(filelist,1)
         
         % Filtering green channel -------------------------------------------------
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > 500,:);
-        if ~strcmp(format,'rapidstorm')
+        if ~strcmp(format_for_filtering,'rapidstorm')
             locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   > 40  ,:);
         end
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       < 400,:);
@@ -182,7 +191,7 @@ for i = 1:size(filelist,1)
         
         % Filtering blue channel --------------------------------------------------
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > 500,:);
-        if ~strcmp(format,'rapidstorm')
+        if ~strcmp(format_for_filtering,'rapidstorm')
             locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   > 40  ,:);
         end
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       < 400,:);
@@ -202,9 +211,13 @@ for i = 1:size(filelist,1)
     % Red channel
     X_RC = locs_RC_filtered.x;
     Y_RC = locs_RC_filtered.y;
-    if strcmp(format,'thunderstorm')
-        sigma_RC = median(locs_RC_filtered.sigma)/magnification;
-    elseif strcmp(format,'rapidstorm')
+    if strcmp(format_for_filtering,'thunderstorm')
+        if (locs_RC_filtered.sigma == 0)
+            sigma_RC = sigma_kernel;
+        else
+            sigma_RC = median(locs_RC_filtered.sigma)/magnification;
+        end 
+    elseif strcmp(format_for_filtering,'rapidstorm')
         sigma_RC = sigma_kernel;
     end
     %sigma_RC = sigma_kernel;
@@ -218,7 +231,11 @@ for i = 1:size(filelist,1)
     X_GC = locs_GC_filtered.x;
     Y_GC = locs_GC_filtered.y;
     if strcmp(format,'thunderstorm')
-        sigma_GC = median(locs_GC_filtered.sigma)/magnification;
+         if (locs_GC_filtered.sigma == 0)
+            sigma_GC = sigma_kernel;
+        else
+            sigma_GC = median(locs_GC_filtered.sigma)/magnification;
+        end 
     elseif strcmp(format,'rapidstorm')
         sigma_GC = sigma_kernel;
     end
@@ -233,7 +250,11 @@ for i = 1:size(filelist,1)
     X_BC = locs_BC_filtered.x;
     Y_BC = locs_BC_filtered.y;
     if strcmp(format,'thunderstorm')
-        sigma_BC = median(locs_BC_filtered.sigma)/magnification;
+         if (locs_BC_filtered.sigma == 0)
+            sigma_BC = sigma_kernel;
+        else
+            sigma_BC = median(locs_BC_filtered.sigma)/magnification;
+        end 
     elseif strcmp(format,'rapidstorm')
         sigma_BC = sigma_kernel;
     end
@@ -281,19 +302,15 @@ for i = 1:size(filelist,1)
     % was chosen to be 500. The variables containing the unfiltered
     % localisations are cleared after filtering to save memory.
     
-    max_radius_RC = max_radius_RC/magnification;
-    max_radius_GC = max_radius_GC/magnification;
-    max_radius_BC = max_radius_BC/magnification;
-    
     % Density filtering red channel -------------------------------------------
     if max_radius_RC ~= 0 && min_nr_locs_RC ~= 0
         % Perform density filtering
         [locs_RC_density_filtered,indeces_RC,~] = ...
             nearestNeighbourDensityFilter([locs_RC_filtered.x locs_RC_filtered.y], ...
-            max_radius_RC,min_nr_locs_RC,show); disp(' ');
+            max_radius_RC,min_nr_locs_RC,show_d); disp(' ');
         if isempty(locs_RC_density_filtered)
             disp('All localizations in the red channel were filtered out during density filtering!');
-            return
+            continue
         else
             nr_locs_before = size(locs_RC_filtered.x,1);
             nr_locs_after  = size(locs_RC_density_filtered,1);
@@ -302,9 +319,9 @@ for i = 1:size(filelist,1)
         % Generate image from filtered localizations
         X_RC = locs_RC_density_filtered(:,1);
         Y_RC = locs_RC_density_filtered(:,2);
-        if strcmp(format,'thunderstorm')
+        if strcmp(format_for_filtering,'thunderstorm')
             sigma_RC = median(locs_RC_filtered.sigma)/magnification;
-        elseif strcmp(format,'rapidstorm')
+        elseif strcmp(format_for_filtering,'rapidstorm')
             sigma_RC = sigma_kernel;
         end
         %sigma_RC = sigma_kernel;
@@ -338,9 +355,9 @@ for i = 1:size(filelist,1)
         % Generate image from filtered localisations
         X_GC = locs_GC_density_filtered(:,1);
         Y_GC = locs_GC_density_filtered(:,2);
-        if strcmp(format,'thunderstorm')
+        if strcmp(format_for_filtering,'thunderstorm')
             sigma_GC = median(locs_GC_filtered.sigma)/magnification;
-        elseif strcmp(format,'rapidstorm')
+        elseif strcmp(format_for_filtering,'rapidstorm')
             sigma_GC = sigma_kernel;
         end
         %sigma_GC = sigma_kernel;
@@ -374,9 +391,9 @@ for i = 1:size(filelist,1)
         % Generate image from filtered localizations
         X_BC = locs_BC_density_filtered(:,1);
         Y_BC = locs_BC_density_filtered(:,2);
-        if strcmp(format,'thunderstorm')
+        if strcmp(format_for_filtering,'thunderstorm')
             sigma_BC = median(locs_BC_filtered.sigma)/magnification;
-        elseif strcmp(format,'rapidstorm')
+        elseif strcmp(format_for_filtering,'rapidstorm')
             sigma_BC = sigma_kernel;
         end
         %sigma_BC = sigma_kernel;
@@ -558,7 +575,6 @@ for i = 1:size(filelist,1)
         writetable(results,fullfile(path_output, filename));
 
         fclose(summary_file);
-
         %% Plot results
 
         % Overlap red and green channel (masks)
