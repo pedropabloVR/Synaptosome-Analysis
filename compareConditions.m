@@ -13,7 +13,7 @@ repeats = {'Sept','Oct-Nov'};
 % dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
 % dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
 
-% Path to directories of different repeats (can be a cell with only one repeat!)
+% Path to directories of different repeats (can be a cell with onlly one repeat!)
 Dir_PHYS  = {fullfile(pwd,'testdata','Results_phys'),...
             fullfile(pwd,'testdata','Results_phys')};
 Dir_EGTA  = {fullfile(pwd,'testdata','Results_egta'),...
@@ -39,6 +39,8 @@ minOverlapBlue     = 10; % minimum overlap between red and green to detect synap
 
 % Minimum distance between two synaptosomes
 min_dist_between_synaptosomes = 300; % in nm
+
+max_Area = 2000; % max area of mCling
 
 r_step = 10;
 R_max = 1000;
@@ -408,6 +410,13 @@ for n = 1:length(repeats)
     disp(['Synaptosomes EGTAK post proximity filter: ' num2str(synapto_number_post_proximityFilter_EGTAK(1))]);
 
 
+    %% Filter on area of mCling
+    
+    results_PHYS  = results_PHYS(results_PHYS.Area < max_Area,:);
+    results_EGTA  = results_EGTA(results_EGTA.Area < max_Area,:);
+    results_EGTAK = results_EGTAK(results_EGTAK.Area < max_Area,:);
+    
+    
     %% Ripley's K analysis
 
     % Create new subfolder in output folder
