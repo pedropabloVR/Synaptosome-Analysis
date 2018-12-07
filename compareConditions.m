@@ -13,7 +13,7 @@ repeats = {'Sept','Oct-Nov'};
 % dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
 % dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
 
-% Path to directories of different repeats (can be a cell with onlly one repeat!)
+% Path to directories of different repeats (can be a cell with only one repeat!)
 Dir_PHYS  = {fullfile(pwd,'testdata','Results_phys'),...
             fullfile(pwd,'testdata','Results_phys')};
 Dir_EGTA  = {fullfile(pwd,'testdata','Results_egta'),...
