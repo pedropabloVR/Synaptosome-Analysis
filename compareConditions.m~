@@ -251,6 +251,7 @@ if filterOverlapGreen
     results_PHYS  = results_PHYS(results_PHYS.OverlapWithGreen   > minOverlapGreen,:);
     results_EGTA  = results_EGTA(results_EGTA.OverlapWithGreen   > minOverlapGreen,:);
     results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithGreen > minOverlapGreen,:);
+<<<<<<< HEAD
 
 elseif filterOverlapBlue
 
@@ -388,6 +389,16 @@ synapto_number_post_proximityFilter_EGTAK = size(results_EGTAK);
 disp(['Synaptosomes PHYS post proximity filter: ' num2str(synapto_number_post_proximityFilter_PHYS(1))]);
 disp(['Synaptosomes EGTA post proximity filter: ' num2str(synapto_number_post_proximityFilter_EGTA(1))]);
 disp(['Synaptosomes EGTAK post proximity filter: ' num2str(synapto_number_post_proximityFilter_EGTAK(1))]);
+=======
+
+elseif filterOverlapBlue
+>>>>>>> upstream/master
+
+    results_PHYS  = results_PHYS(results_PHYS.OverlapWithBlue   > minOverlapBlue,:);
+    results_EGTA  = results_EGTA(results_EGTA.OverlapWithBlue   > minOverlapBlue,:);
+    results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithBlue > minOverlapBlue,:);
+
+end
 
 %% Ripley's K analysis
 
@@ -991,6 +1002,49 @@ results_combined_after_filtering(ismember(results_combined_after_filtering.inter
 results_combined_after_filtering(ismember(results_combined_after_filtering.interclusterdistRB,-1),:)=[];
 results_combined_after_filtering(ismember(results_combined_after_filtering.interclusterdistGB,-1),:)=[];
 
+
+<<<<<<< HEAD
+=======
+%% Remove synaptosomes that are too close together
+
+unique_conditions = unique(results_combined_after_filtering.condition);
+
+% Loop over different conditions in the results
+for i=1:size(unique_conditions)
+    
+    % Get only results of current condition
+    condition_i = unique_conditions{i};
+    results_condition_i = results_combined_after_filtering(...
+        strcmp(results_combined_after_filtering.condition,condition_i),:);
+    
+    % Loop over sample_ID in the results
+    sample_IDs = unique(results_condition_i.sampleID);
+    for j=1:size(sample_IDs,1)
+        sample_ID_j = sample_IDs{j};
+        results_sampleID = results_condition_i(...
+            strcmp(results_condition_i.sampleID,sample_ID_j),:);
+        
+        % Get indeces of synaptosomes in this sample that are too close
+        % together
+        points = [results_sampleID.xCentroid results_sampleID.yCentroid];
+        pairwise_dist_matrix = pdist2(points,points);
+        to_remove = (pairwise_dist_matrix < min_dist_between_synaptosomes) - eye(size(points,1));
+        index_to_remove = sum(to_remove) > 0;
+        disp(['To remove: ' num2str(sum(index_to_remove))]);
+
+        % Remove the synaptosomes that are too close together
+        filtered_results_sampleID = results_sampleID(index_to_remove == 0,:);
+        if ~exist('final_results')
+            final_results = filtered_results_sampleID;
+        else
+            final_results = [final_results; filtered_results_sampleID];
+        end
+    end
+end
+
+results_combined_after_filtering = final_results;
+
+>>>>>>> upstream/master
 %% Save results
 
 path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.mat');
