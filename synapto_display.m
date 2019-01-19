@@ -15,16 +15,22 @@
 % Laser Analytics Group
 % Updated 28/09/2018
 
-%% Load raw synaptosome reconstructions 
-clear all 
+%% Load raw synaptosome reconstructions  
 close all
 
-Path        = 'F:\synaptosomes\Results_combined_20181205_final\ripley\phys\images';
-output_dir  = 'F:\synaptosomes\Results_combined_20181205_final';
-%output_dir  = 'F:\synaptosomes\Results_combined';
+
+Path        = 'E:\Experiments\synaptosomes\analysis_20190107\37C_results_thresh30\Results_combined\Repeat_B\ripley\phys\images';
+output_dir  = 'E:\Experiments\synaptosomes\analysis_20190107\37C_results_thresh30\Results_combined';
+
+% load .csv file with trimmed pooled results after manual removal of "ugly"
+% regions
+
+csv_path = "E:\Experiments\synaptosomes\analysis_20190107\4C_results\Results_combined\results_combined_pooled_trimmed.csv";
+results_pooled = resultscombinedpooledtrimmed;
 
 % select area token and label token for your data files
 condition = 'phys';
+repeat    = 'B';
 im_cutoff = 20;
 show      = 0;
 RC_token  = ['_' condition '_RC_synaptosome_'];
@@ -43,6 +49,19 @@ disp('Opening files in following folder:');
 disp(PathNameRC);
 disp(['Number of files found: ', num2str(N_files)]);
 
+% choose names from relevant repeat and condition
+sampleIDs_repeat = results_pooled(strcmp(results_pooled.Repeat,repeat),:);
+sampleIDs_condition = sampleIDs_repeat(strcmp(sampleIDs_repeat.condition,condition),:);
+num_trimmed_files = size(sampleIDs_condition);
+sampleIDs_names = cell(num_trimmed_files(1),1);
+% concatenate names of sample ID and synaptosome ID
+for i = 1:num_trimmed_files(1)
+    temp = strsplit(sampleIDs_condition.sampleID(i),'_');
+    samp_ID = strcat(temp(1)," ",temp(2));
+    sampleIDs_names{i,1} = strcat(samp_ID," " ,num2str(sampleIDs_condition.synaptosomeID(i)));
+
+end 
+
 %% display images 
 imred = cell(N_files,1);
 imgreen = cell(N_files,1);
@@ -53,9 +72,10 @@ green = cell(N_files,1);
 blue = cell(N_files,1);
 imlabel = cell(N_files,1);
 im_names = cell(N_files,1);
+trimmed_names_indices = false(N_files,1);
 
 
-path_output = fullfile(output_dir, filesep,['Synapto_montage_' condition]);
+path_output = fullfile(output_dir, filesep,['Synapto_montage_' condition repeat ]);
 if exist(path_output, 'dir')
     opts.Interpreter = 'tex';
     opts.Default = 'Continue';
@@ -93,8 +113,25 @@ for i = 1: N_files
     imlabel{i,1}        = insertText(imlabel{i,1},position,im_names{i,1},'AnchorPoint','Center','TextColor','black','FontSize',16,'BoxColor','white');
     imlabel{i,1}        = rot90(imlabel{i,1});
     
+    % now choose only images with labels which correspond to labels on the
+    % trimmed spreadsheet
+    for lp = 1:num_trimmed_files(1)
+        same = strcmp(im_names{i,1},sampleIDs_names{lp});
+        if same 
+         trimmed_names_indices(i) = true;  
+        end    
+    end 
+    
 end 
 
+% Keep only images which correspond to selected ones on the trimmed
+% spreadsheet
+red     = red(trimmed_names_indices,:);
+green   = green(trimmed_names_indices,:);
+blue    = blue(trimmed_names_indices,:);
+overlay = overlay(trimmed_names_indices,:);
+imlabel = imlabel(trimmed_names_indices,:);
+N_files = size(red,1);
 % cycle through the images, 20 at a time, display them, and then continue
 % with the next 20 until there are none left
 

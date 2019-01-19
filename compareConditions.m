@@ -3,62 +3,54 @@ close all
 clc
 tic
 
-repeats = {'Sept','Oct-Nov'};
+% Added lines to include the number of localisations per region of interest
+% in the results table. 
 
+
+repeats = {'A','B'}; %,'Oct-Nov'};
 % dir_PHYS  = 'F:\synaptosomes\Results_phys';
 % dir_EGTA  = 'F:\synaptosomes\Results_egta';
 % dir_EGTAK = 'F:\synaptosomes\Results_egtak';
 
-<<<<<<< HEAD
- dir_PHYS  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205\Results_phys';
- dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205\Results_egta';
- dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205\Results_egtak';
-
-output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results20181205',filesep);
-
-=======
 % dir_PHYS  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_phys';
 % dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
 % dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
 
-% Path to directories of different repeats (can be a cell with onlly one repeat!)
-Dir_PHYS  = {fullfile(pwd,'testdata','Results_phys'),...
-            fullfile(pwd,'testdata','Results_phys')};
-Dir_EGTA  = {fullfile(pwd,'testdata','Results_egta'),...
-            fullfile(pwd,'testdata','Results_egta')};
-Dir_EGTAK = {fullfile(pwd,'testdata','Results_egtak'),...
-            fullfile(pwd,'testdata','Results_egtak')};
+% Path to directories of different repeats (can be a cell with only one repeat!)
+Dir_PHYS  = {fullfile('E:\Experiments\synaptosomes\analysis_20190107\4Ca','Results_phys'),...
+            fullfile('E:\Experiments\synaptosomes\analysis_20190107\4Cb','Results_phys'),};
+Dir_EGTA  = {fullfile('E:\Experiments\synaptosomes\analysis_20190107\4Ca','Results_egta'),...
+            fullfile('E:\Experiments\synaptosomes\analysis_20190107\4Cb','Results_egta'),};
+Dir_EGTAK = {fullfile('E:\Experiments\synaptosomes\analysis_20190107\4Ca','Results_egtak'),...
+            fullfile('E:\Experiments\synaptosomes\analysis_20190107\4Cb','Results_egtak')};
         
 % output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
-output_dir = fullfile(pwd,'testdata');
->>>>>>> upstream/master
-
-format = 'thunderstorm';
-magnification = 10;
+output_dir      = fullfile('E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20');
+format          = 'thunderstorm';
+magnification   = 10;
 
 imgtype = '_reconstruction_RGB.tif'; % image to mark detected synaptosomes on with circles
-radius = 100; % radius of the circles
-colour = [100 100 100]; % colour of the circles (triplet)
+radius  = 100; % radius of the circles
+colour  = [100 100 100]; % colour of the circles (triplet)
 
 % Parameters for filtering on overlap between channels to detect synaptosomes
 filterOverlapGreen = 1;  % 1 to filter on overlap between red and green to detect synaptosomes
 filterOverlapBlue  = 1;  % 1 to filter on overlap between red and blue  to detect synaptosomes
-minOverlapGreen    = 10;  % minimum overlap between red and green to detect synaptosomes
-minOverlapBlue     = 10; % minimum overlap between red and green to detect synaptosomes
+minOverlapGreen    = 20;  % minimum overlap between red and green to detect synaptosomes
+minOverlapBlue     = 20; % minimum overlap between red and green to detect synaptosomes
 
 % Minimum distance between two synaptosomes
-min_dist_between_synaptosomes = 300; % in nm
+min_dist_between_synaptosomes   = 300; % in nm
+max_Area                        = 2000; % max area of mCling
 
-max_Area = 2000; % max area of mCling
-
-r_step = 10;
-R_max = 1000;
-windowsize = 80; % pixels
-pixelsize = 117; % nm
+r_step      = 10;
+R_max       = 1000;
+windowsize  = 80; % pixels
+pixelsize   = 117; % nm
 
 plot_results_individual_repeats = 1; % 1 to also plot results of individual repeats seperately
-show = 0; % to show intermediate results
-flagprint  = 1; % set to 1 to save the fig visualization of the results
+show                            = 0; % to show intermediate results
+flagprint                       = 1; % set to 1 to save the fig visualization of the results
 
 
 %% Loop over repeats
@@ -68,9 +60,9 @@ clear var results_repeats_pooled
 for n = 1:length(repeats)
     
     % Get directories of current repeat
-    dir_PHYS = Dir_PHYS{n};
-    dir_EGTA = Dir_EGTA{n};
-    dir_EGTAK = Dir_EGTAK{n};
+    dir_PHYS    = Dir_PHYS{n};
+    dir_EGTA    = Dir_EGTA{n};
+    dir_EGTAK   = Dir_EGTAK{n};
 
     % Create new output folder
     path_output = fullfile(output_dir,'Results_combined',['Repeat_' repeats{n}]);
@@ -134,8 +126,7 @@ for n = 1:length(repeats)
     % Add sampleID column in front
     results_PHYS.sampleID  = sampleIDs';
     results_PHYS = results_PHYS(:,[end 1:end-1]);
-
-
+    
     % EGTA ----------------------------------------------------------------
 
     % Read in all EGTA results and merge in one table
@@ -247,7 +238,7 @@ for n = 1:length(repeats)
     %% Merge tables of the three conditions before filtering
 
     results_combined = [results_PHYS; results_EGTA; results_EGTAK];
-
+    
     clear var phys egta egtak
     [phys{1:size(results_PHYS,1)}] = deal('phys');
     [egta{1:size(results_EGTA,1)}] = deal('egta');
@@ -276,17 +267,17 @@ for n = 1:length(repeats)
     synapto_number_prefilter_EGTAK = size(results_EGTAK);
 
     if filterOverlapGreen
-
         results_PHYS  = results_PHYS(results_PHYS.OverlapWithGreen   > minOverlapGreen,:);
         results_EGTA  = results_EGTA(results_EGTA.OverlapWithGreen   > minOverlapGreen,:);
         results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithGreen > minOverlapGreen,:);
-
-    elseif filterOverlapBlue
+    end 
+    % The elseif in the previous loop was never executed as long as
+    % filterOverlapGreen was true
+    if filterOverlapBlue
 
         results_PHYS  = results_PHYS(results_PHYS.OverlapWithBlue   > minOverlapBlue,:);
         results_EGTA  = results_EGTA(results_EGTA.OverlapWithBlue   > minOverlapBlue,:);
         results_EGTAK = results_EGTAK(results_EGTAK.OverlapWithBlue > minOverlapBlue,:);
-
     end
 
     synapto_number_post_overlapFilter_PHYS = size(results_PHYS);
@@ -377,7 +368,7 @@ for n = 1:length(repeats)
     results_EGTA = filtered_results_EGTA;
 
     
-    % EGTA condition ------------------------------------------------------
+    % EGTAK condition ------------------------------------------------------
 
     % Loop over sample_ID in the results
     sample_IDs = unique(results_EGTAK.sampleID);
@@ -425,6 +416,24 @@ for n = 1:length(repeats)
     results_EGTA  = results_EGTA(results_EGTA.Area < max_Area,:);
     results_EGTAK = results_EGTAK(results_EGTAK.Area < max_Area,:);
     
+    %% Add column to record number of localisations per region analyzed in Ripley's K
+    
+    num_regions_PHYS = size(results_PHYS,1); 
+    num_regions_EGTA = size(results_EGTA,1); 
+    num_regions_EGTAK = size(results_EGTAK,1); 
+    
+    results_PHYS.numLocs_RC = zeros(num_regions_PHYS,1);
+    results_EGTA.numLocs_RC = zeros(num_regions_EGTA,1);
+    results_EGTAK.numLocs_RC = zeros(num_regions_EGTAK,1);
+
+    results_PHYS.numLocs_GC = zeros(num_regions_PHYS,1);
+    results_EGTA.numLocs_GC = zeros(num_regions_EGTA,1);
+    results_EGTAK.numLocs_GC = zeros(num_regions_EGTAK,1);
+    
+    results_PHYS.numLocs_BC = zeros(num_regions_PHYS,1);
+    results_EGTA.numLocs_BC = zeros(num_regions_EGTA,1);
+    results_EGTAK.numLocs_BC = zeros(num_regions_EGTAK,1);
+    
     
     %% Ripley's K analysis
 
@@ -447,6 +456,10 @@ for n = 1:length(repeats)
     ripley_RG = [];
     ripley_RB = [];
     ripley_GB = [];
+    
+    numLocs_RC_PHYS = [];
+    numLocs_GC_PHYS = [];
+    numLocs_BC_PHYS = [];
 
     % Create subfolders
     mkdir(fullfile(path_output_ripley,condition,'RC'));
@@ -483,7 +496,11 @@ for n = 1:length(repeats)
         ripley_RG_i = zeros(length(r_hist),num_synaptosomes);
         ripley_RB_i = zeros(length(r_hist),num_synaptosomes);
         ripley_GB_i = zeros(length(r_hist),num_synaptosomes);    
-
+        
+        num_Locs_RC_i = zeros(num_synaptosomes,1);
+        num_Locs_GC_i = zeros(num_synaptosomes,1);
+        num_Locs_BC_i = zeros(num_synaptosomes,1);
+        
         % Loop over all synaptosomes
         for j = 1:num_synaptosomes
 
@@ -507,6 +524,10 @@ for n = 1:length(repeats)
             Y_GC = locs_GC_cropped.y;
             X_BC = locs_BC_cropped.x;
             Y_BC = locs_BC_cropped.y;
+            
+            num_Locs_RC_i(j,1) = size(X_RC,1);
+            num_Locs_GC_i(j,1) = size(X_GC,1);
+            num_Locs_BC_i(j,1) = size(X_BC,1);
 
             % Get images of cropped regions and write them away
             % These images will be used later in the synapto_display.m script
@@ -550,6 +571,11 @@ for n = 1:length(repeats)
         ripley_RG = [ripley_RG ripley_RG_i];
         ripley_RB = [ripley_RB ripley_RB_i];
         ripley_GB = [ripley_GB ripley_GB_i];
+        
+        numLocs_RC_PHYS = [numLocs_RC_PHYS num_Locs_RC_i'];
+        numLocs_GC_PHYS = [numLocs_GC_PHYS num_Locs_GC_i'];
+        numLocs_BC_PHYS = [numLocs_BC_PHYS num_Locs_BC_i'];
+        
     end
 
     H_all_phys_RC = ripley_RR;
@@ -559,6 +585,10 @@ for n = 1:length(repeats)
     H_all_phys_RB = ripley_RB;
     H_all_phys_GB = ripley_GB;
 
+    results_PHYS.numLocs_RC = numLocs_RC_PHYS';
+    results_PHYS.numLocs_GC = numLocs_GC_PHYS';
+    results_PHYS.numLocs_BC = numLocs_BC_PHYS';
+    
     % Write away Ripley's functions before removing NaN columns (to retain
     % information about from which synaptosome the curve came)
     path_ripley_phys = fullfile(path_output_ripley,'H_phys.mat');
@@ -577,6 +607,10 @@ for n = 1:length(repeats)
     ripley_RG = [];
     ripley_RB = [];
     ripley_GB = [];
+    
+    numLocs_RC_EGTA = [];
+    numLocs_GC_EGTA = [];
+    numLocs_BC_EGTA = [];
 
     % Create subfolders
     mkdir(fullfile(path_output_ripley,condition,'RC'));
@@ -614,6 +648,10 @@ for n = 1:length(repeats)
         ripley_RB_i = zeros(length(r_hist),num_synaptosomes);
         ripley_GB_i = zeros(length(r_hist),num_synaptosomes);    
 
+        num_Locs_RC_i = zeros(num_synaptosomes,1);
+        num_Locs_GC_i = zeros(num_synaptosomes,1);
+        num_Locs_BC_i = zeros(num_synaptosomes,1);
+                
         % Loop over all synaptosomes
         for j = 1:num_synaptosomes
 
@@ -638,6 +676,10 @@ for n = 1:length(repeats)
             X_BC = locs_BC_cropped.x;
             Y_BC = locs_BC_cropped.y;
 
+            num_Locs_RC_i(j,1) = size(X_RC,1);
+            num_Locs_GC_i(j,1) = size(X_GC,1);
+            num_Locs_BC_i(j,1) = size(X_BC,1);
+            
             % Get images of cropped regions and write them away
             sigma = 150/magnification;
             intensities_RC = locs_RC_cropped.intensity;
@@ -679,6 +721,11 @@ for n = 1:length(repeats)
         ripley_RG = [ripley_RG ripley_RG_i];
         ripley_RB = [ripley_RB ripley_RB_i];
         ripley_GB = [ripley_GB ripley_GB_i];
+        
+        numLocs_RC_EGTA = [numLocs_RC_EGTA num_Locs_RC_i'];
+        numLocs_GC_EGTA = [numLocs_GC_EGTA num_Locs_GC_i'];
+        numLocs_BC_EGTA = [numLocs_BC_EGTA num_Locs_BC_i'];
+          
     end
 
     H_all_egta_RC = ripley_RR;
@@ -687,6 +734,10 @@ for n = 1:length(repeats)
     H_all_egta_RG = ripley_RG;
     H_all_egta_RB = ripley_RB;
     H_all_egta_GB = ripley_GB;
+    
+    results_EGTA.numLocs_RC = numLocs_RC_EGTA';
+    results_EGTA.numLocs_GC = numLocs_GC_EGTA';
+    results_EGTA.numLocs_BC = numLocs_BC_EGTA';
 
     % Write away Ripley's functions before removing NaN columns (to retain
     % information about from which synaptosome the curve came)
@@ -706,6 +757,10 @@ for n = 1:length(repeats)
     ripley_RG = [];
     ripley_RB = [];
     ripley_GB = [];
+    
+    numLocs_RC_EGTAK = [];
+    numLocs_GC_EGTAK = [];
+    numLocs_BC_EGTAK = [];
 
     % Create subfolders
     mkdir(fullfile(path_output_ripley,condition,'RC'));
@@ -743,6 +798,10 @@ for n = 1:length(repeats)
         ripley_RB_i = zeros(length(r_hist),num_synaptosomes);
         ripley_GB_i = zeros(length(r_hist),num_synaptosomes);    
 
+        num_Locs_RC_i = zeros(num_synaptosomes,1);
+        num_Locs_GC_i = zeros(num_synaptosomes,1);
+        num_Locs_BC_i = zeros(num_synaptosomes,1);
+        
         % Loop over all synaptosomes
         for j = 1:num_synaptosomes
 
@@ -766,6 +825,10 @@ for n = 1:length(repeats)
             Y_GC = locs_GC_cropped.y;
             X_BC = locs_BC_cropped.x;
             Y_BC = locs_BC_cropped.y;
+                        
+            num_Locs_RC_i(j,1) = size(X_RC,1);
+            num_Locs_GC_i(j,1) = size(X_GC,1);
+            num_Locs_BC_i(j,1) = size(X_BC,1);
 
             % Get images of cropped regions and write them away
             sigma = 150/magnification;
@@ -808,6 +871,12 @@ for n = 1:length(repeats)
         ripley_RG = [ripley_RG ripley_RG_i];
         ripley_RB = [ripley_RB ripley_RB_i];
         ripley_GB = [ripley_GB ripley_GB_i];
+        
+        numLocs_RC_EGTAK = [numLocs_RC_EGTAK num_Locs_RC_i'];
+        numLocs_GC_EGTAK = [numLocs_GC_EGTAK num_Locs_GC_i'];
+        numLocs_BC_EGTAK = [numLocs_BC_EGTAK num_Locs_BC_i'];
+        
+        
     end
 
     H_all_egtak_RC = ripley_RR;
@@ -817,6 +886,10 @@ for n = 1:length(repeats)
     H_all_egtak_RB = ripley_RB;
     H_all_egtak_GB = ripley_GB;
 
+    results_EGTAK.numLocs_RC = numLocs_RC_EGTAK';
+    results_EGTAK.numLocs_GC = numLocs_GC_EGTAK';
+    results_EGTAK.numLocs_BC = numLocs_BC_EGTAK';
+    
     % Write away Ripley's functions before removing NaN columns (to retain
     % information about from which synaptosome the curve came)
     path_ripley_egtak = fullfile(path_output_ripley,'H_egtak.mat');

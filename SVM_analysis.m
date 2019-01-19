@@ -34,8 +34,8 @@ display_gallery = 1;
 %% 1) Prepare dataset
 
 % Load data
-load(path_data);
-
+% load(path_data);
+data = resultscombinedpooledtrimmed;
 % Remove rows that have -1 value in any of the Ripley's columns
 data(ismember(data.clustersizeRC,-1),:)=[];
 data(ismember(data.clustersizeGC,-1),:)=[];
