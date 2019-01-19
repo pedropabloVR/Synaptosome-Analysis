@@ -30,7 +30,8 @@
 % 
 % Author: Ezra Bruggeman, Laser Analytics Group
 %
-% Last updated on 23 Aug 2018
+% Last updated on 07/01/2019
+% the intensity of the image is now given by the number of localisations. 
 
 
 function img = generateImage(X,Y,sigma,intensity,Fov,pixelsize,magnification)
@@ -52,7 +53,7 @@ for i=1:size(X,1)
     if idx_y < 1
         idx_y = 1;
     end
-    img(idx_x,idx_y) =+ intensity(i);
+    img(idx_x,idx_y) =+ 1; %modified to fill image intensity by number of localisations
 end
 
 % % Apply gaussian smoothing (later versions of matlab)
