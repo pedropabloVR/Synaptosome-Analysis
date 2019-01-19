@@ -111,12 +111,14 @@ h = plotSpread({overlapGreen_PHYS,overlapGreen_EGTA,overlapGreen_EGTAK},'xNames'
 ylabel('% area overlap'); ylim([0 100]);
 title({'Unweighted overlap','mCling and a-synuclein'});
 pbaspect([1 1 1])
+ylim([0 100])
 
 subplot(122)
 boxplot(overlapGreen,conditions);
 ylabel('% area overlap'); ylim([0 100]);
 title({'Unweighted overlap','mCling and a-synuclein'});
 pbaspect([1 1 1])
+ylim([0 100])
 
 if flagprint
     savefig(fig2,fullfile(path_figures_overlap,'unweighted-overlap-mcling-a-synuclein.fig'))
@@ -141,12 +143,14 @@ h = plotSpread({overlapBlue_PHYS,overlapBlue_EGTA,overlapBlue_EGTAK},'xNames',{'
 ylabel('% area overlap'); ylim([0 100]);
 title({'Unweighted overlap','mCling and VAMP2'});
 pbaspect([1 1 1])
+ylim([0 100])
 
 subplot(122)
 boxplot(overlapBlue,conditions);
 ylabel('% area overlap'); ylim([0 100]);
 title({'Unweighted overlap','mCling and VAMP2'});
 pbaspect([1 1 1])
+ylim([0 100])
 
 if flagprint
     savefig(fig3,fullfile(path_figures_overlap,'unweighted-overlap-mcling-vamp2.fig'))
@@ -170,12 +174,14 @@ h = plotSpread({weightedOverlapWithGreen_PHYS,weightedOverlapWithGreen_EGTA,weig
 ylabel('Weighted overlap');
 title({'Weighted overlap','mCling and a-synuclein'});
 pbaspect([1 1 1])
+ylim([0 1])
 
 subplot(122)
 boxplot(weightedOverlapWithGreen,conditions);
 ylabel('Weighted overlap');
 title({'Weighted overlap','mCling and a-synuclein'});
 pbaspect([1 1 1])
+ylim([0 1])
 
 if flagprint
     savefig(fig6,fullfile(path_figures_overlap,'weighted-overlap-mcling-a-synuclein.fig'))
@@ -199,12 +205,14 @@ h = plotSpread({weightedOverlapWithBlue_PHYS,weightedOverlapWithBlue_EGTA,weight
 ylabel('Weighted overlap');
 title({'Weighted overlap','mCling and VAMP2'});
 pbaspect([1 1 1])
+ylim([0 1])
 
 subplot(122)
 boxplot(weightedOverlapWithBlue,conditions);
 ylabel('Weighted overlap');
 title({'Weighted overlap','mCling and VAMP2'});
 pbaspect([1 1 1])
+ylim([0 1])
 
 if flagprint
     savefig(fig7,fullfile(path_figures_overlap,'weighted-overlap-mcling-vamp2.fig'))
