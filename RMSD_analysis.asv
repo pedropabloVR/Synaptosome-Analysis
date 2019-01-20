@@ -4,10 +4,7 @@
 % plotted and a mean ± SD is returned.
 % 
 % Author: Ezra Bruggeman, Laser Analytics Group
-% Last updated on 20 Jan 2019
-% Updated to allow for multiple repeats of the same condition to be input
-% for analysis. A concatenated table for all repeats is also output in a
-% separate folder. 
+% Last updated on 19 Sept 2018
 
 
 %% Parameters
@@ -25,12 +22,12 @@ format = 'thunderstorm'; % reconstruction software used
 % dir_egta  = 'F:\Data\Synaptosomes\Experiment_4C\Results\Results_combined\ripley\egta';
 % dir_egtak = 'F:\Data\Synaptosomes\Experiment_4C\Results\Results_combined\ripley\egtak';
 repeats = {'A','B'};
-dir_phys  = {'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_A\ripley\phys',...
-            'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_B\ripley\phys'};
-dir_egta  = {'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_A\ripley\egta',...
-            'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_B\ripley\egta'};
-dir_egtak =  {'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_A\ripley\egtak',...
-            'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_B\ripley\egtak'};
+dir_phys  = {'E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20\Results_combined\Repeat_A\ripley\phys',...
+            'E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20\Results_combined\Repeat_B\ripley\phys'};
+dir_egta  = {'E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20\Results_combined\Repeat_A\ripley\egta',...
+            'E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20\Results_combined\Repeat_B\ripley\egta'};
+dir_egtak =  {'E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20\Results_combined\Repeat_A\ripley\egtak',...
+            'E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20\Results_combined\Repeat_B\ripley\egtak'};
 
 % dir_phys  = fullfile(pwd,'testdata/condition1_phys');  % path to testdata condition 1
 % dir_egta  = fullfile(pwd,'testdata/condition2_egta');  % path to testdata condition 2
@@ -38,7 +35,7 @@ dir_egtak =  {'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Re
 
 % Results will be saved in a new folder 'rmsd' in this directory
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results\Results_combined';
-output_dir = 'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\';
+output_dir = 'E:\Experiments\synaptosomes\analysis_20190107\4C_20190118_t20\Results_combined\';
 make_plot = 0;
 flagsave = 1; % 1 to write away results
 
@@ -120,7 +117,7 @@ writetable(results_rmsd,path_results_rmsd,'Delimiter','\t');
 
 % add a column for repeat
     clear var repeat
-    [repeat{1:size(results_rmsd,1)}] = deal(repeats{n});
+    [repeat{1:size(results_RMSD,1)}] = deal(repeats{n});
     results_rmsd.Repeat = repeat';
     results_rmsd = results_rmsd(:,[end 1:end-1]);
     
@@ -218,7 +215,7 @@ mkdir(path_output);
 % Write away results
 path_results_combined = fullfile(path_output,'results_combined_rmsd.mat');
 save(path_results_combined,'results_repeats_pooled');
-path_results_combined = fullfile(path_output,'results_combined_rmsd.txt');
+path_results_combined = fullfile(path_output,'results_combined_after_overlap_threshold.txt');
 writetable(results_repeats_pooled,path_results_combined,'Delimiter','\t');
 
 % Split results table into conditions (for convenience when plotting)
