@@ -178,9 +178,10 @@ for i = 1:size(filelist,1)
     % sparse enough to assure good reconstruction), keep only localisations
     % that have a sigma between 40 nm and 400 nm (to avoid grid artefacts
     % and exclude localizations that are out of focus) and uncertainty
-    % smaller than 40 nm and larger than 5 nm (the expected resolution of the reconstructed
-    % dSTORM images). For the red channel the intensity threshold is set at
-    % 1000 photons, and for the green and blue channels at 500 photons. 
+    % smaller than 40 nm (the expected resolution of the reconstructed
+    % dSTORM images). For the red channel the intensity threshold is put at
+    % 1000 photons, and for the green and blue channels at 500 photons
+    % (because ...).
     
     if filter
         % Filtering red channel ---------------------------------------------------
@@ -191,7 +192,7 @@ for i = 1:size(filelist,1)
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       < 400 ,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.intensity   > 1000,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty < 40  ,:);
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty > 5  ,:);
+        
         % Filtering green channel -------------------------------------------------
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > 500,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
@@ -200,7 +201,7 @@ for i = 1:size(filelist,1)
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       < 400,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.intensity   > 500,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty < 40 ,:);
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty > 5 ,:);
+        
         % Filtering blue channel --------------------------------------------------
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > 500,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
@@ -209,7 +210,6 @@ for i = 1:size(filelist,1)
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       < 400,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.intensity   > 500,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty < 40 ,:);
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty > 5 ,:);
     end
     
     %% Write away filtered localisations
@@ -217,7 +217,8 @@ for i = 1:size(filelist,1)
     writeLocFile(locs_RC_filtered,fullfile(path_output,strcat(area_token,'_locs_RC_filtered.csv')),format)
     writeLocFile(locs_GC_filtered,fullfile(path_output,strcat(area_token,'_locs_GC_filtered.csv')),format)
     writeLocFile(locs_BC_filtered,fullfile(path_output,strcat(area_token,'_locs_BC_filtered.csv')),format)
-       
+    
+    
     %% Generate SMLM reconstructions (before density filtering)
     
     % Red channel
@@ -308,7 +309,7 @@ for i = 1:size(filelist,1)
     % filtering is applied (the images are cluttered). Only localisations
     % that have a minimum number of neighbouring localisations within some
     % specified search radius are kept. Considering the radius of a
-    % synaptosome is about 500 nm, this value is chosen for the search
+    % synaptosome is about 500 nm, this value is chosen for the searh
     % radius. By looking at a number of images and testing out different
     % parameters, the minimum number of localisations within this radius
     % was chosen to be 500. The variables containing the unfiltered
