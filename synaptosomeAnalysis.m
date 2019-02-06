@@ -30,12 +30,12 @@ tic
 %% Parameters
 
 %directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
-directory = 'E:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\37Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
-
+%directory = 'E:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\37Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
+directory = '/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_phys';
 % path to folder where outputfolder will be created (if doesn't already exist)
 %output_dir = 'F:\Data\Synaptosomes\Experiment_37C';
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C';
-output_dir = fullfile('E:\Experiments\synaptosomes\analysis_20190107\37Cb_test',filesep);
+output_dir = fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis',filesep);
 
 condition        = 'phys';
 
@@ -44,7 +44,7 @@ channel_token_GC = '_561_reg';
 channel_token_BC = '_488_reg';
 
 format               = 'thunderstorm'; % reconstruction software used (only thunderstorm)
-format_for_filtering = 'rapidstorm';
+format_for_filtering = 'thunderstorm';
 
 pixelsize            = 117; % pixelsize in nm
 magnification        = 10; % value of 10 gives 11.7 nm pixels in reconstruction (if pixelsize camera is 117 nm)
@@ -134,6 +134,12 @@ for i = 1:size(filelist,1)
     locs_GC = readLocFile(fullfile(directory,filename_GC),format);
     locs_BC = readLocFile(fullfile(directory,filename_BC),format);
     
+    % Record number of localisations before filtering
+    num_locs_RC_prefilter = size(locs_RC,1);
+    num_locs_GC_prefilter = size(locs_GC,1);
+    num_locs_BC_prefilter = size(locs_BC,1);
+    
+    
     %% Estimate Fov
     % Assumes there will be at least one localisation close to the edges
     % of the Fov in one of the three channels
@@ -144,7 +150,7 @@ for i = 1:size(filelist,1)
     
     
     %% Optional removal of edge artefacts
-    % Big high intensity blobs around the edges of images can throw of the
+    % Big high intensity blobs around the edges of images can throw off the
     % synaptosome detector, so a border with some specified width can be
     % cropped out before doing any further processing.
     
@@ -187,31 +193,49 @@ for i = 1:size(filelist,1)
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.frame       > 500 ,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
             locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   > 40  ,:);
+            locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   < 400 ,:);
         end
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma       < 400 ,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.intensity   > 1000,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty < 40  ,:);
         locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty > 5  ,:);
+        
         % Filtering green channel -------------------------------------------------
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > 500,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
             locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   > 40  ,:);
+            locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   < 400,:);
         end
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma       < 400,:);
+        
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.intensity   > 500,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty < 40 ,:);
         locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty > 5 ,:);
+        
         % Filtering blue channel --------------------------------------------------
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > 500,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
             locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   > 40  ,:);
-        end
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma       < 400,:);
+            locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   < 400,:);
+        end      
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.intensity   > 500,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty < 40 ,:);
         locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty > 5 ,:);
     end
     
+    % Get number of localisations after filter
+    num_locs_RC_postfilter = size(locs_RC_filtered,1);
+    num_locs_GC_postfilter = size(locs_GC_filtered,1);
+    num_locs_BC_postfilter = size(locs_BC_filtered,1);
+    
+    % calculate overall rejection rate (percentage) after localisation filters
+    overall_rejection_RC = ((num_locs_RC_prefilter-num_locs_RC_postfilter)/num_locs_RC_prefilter)*100;
+    overall_rejection_GC = ((num_locs_GC_prefilter-num_locs_GC_postfilter)/num_locs_GC_prefilter)*100;
+    overall_rejection_BC = ((num_locs_BC_prefilter-num_locs_BC_postfilter)/num_locs_BC_prefilter)*100;
+    
+    fprintf(summary_file,'Overall rejection rate after localisation filtering \n');
+    fprintf(summary_file,'Red channel: %2.f %%\n',overall_rejection_RC);
+    fprintf(summary_file,'Green channel: %2.f %%\n',overall_rejection_GC);
+    fprintf(summary_file,'Green channel: %2.f %%\n',overall_rejection_GC);
+   
     %% Write away filtered localisations
     
     writeLocFile(locs_RC_filtered,fullfile(path_output,strcat(area_token,'_locs_RC_filtered.csv')),format)
@@ -314,6 +338,7 @@ for i = 1:size(filelist,1)
     % was chosen to be 500. The variables containing the unfiltered
     % localisations are cleared after filtering to save memory.
     
+    fprintf(summary_file,'Rejection Rate after density filtering \n');
     % Density filtering red channel -------------------------------------------
     if max_radius_RC ~= 0 && min_nr_locs_RC ~= 0
         % Perform density filtering
@@ -326,7 +351,7 @@ for i = 1:size(filelist,1)
         else
             nr_locs_before = size(locs_RC_filtered.x,1);
             nr_locs_after  = size(locs_RC_density_filtered,1);
-            fprintf(summary_file,'Red   channel: %1.f %%\n', (nr_locs_after/nr_locs_before)*100);
+            fprintf(summary_file,'Red   channel: %1.f %%\n', ((nr_locs_before-nr_locs_after)/nr_locs_before)*100);
         end
         % Generate image from filtered localizations
         X_RC = locs_RC_density_filtered(:,1);
@@ -362,7 +387,7 @@ for i = 1:size(filelist,1)
         else
             nr_locs_before = size(locs_GC_filtered.x,1);
             nr_locs_after  = size(locs_GC_density_filtered,1);
-            fprintf(summary_file,'Green channel: %1.f %%\n', (nr_locs_after/nr_locs_before)*100);
+            fprintf(summary_file,'Green channel: %1.f %%\n', ((nr_locs_before-nr_locs_after)/nr_locs_before)*100);
         end
         % Generate image from filtered localisations
         X_GC = locs_GC_density_filtered(:,1);
@@ -398,7 +423,7 @@ for i = 1:size(filelist,1)
         else
             nr_locs_before = size(locs_BC_filtered.x,1);
             nr_locs_after  = size(locs_BC_density_filtered,1);
-            fprintf(summary_file,'Blue  channel: %1.f %%\n\n', (nr_locs_after/nr_locs_before)*100);
+            fprintf(summary_file,'Blue  channel: %1.f %%\n\n', ((nr_locs_before-nr_locs_after)/nr_locs_before)*100);
         end
         % Generate image from filtered localizations
         X_BC = locs_BC_density_filtered(:,1);
