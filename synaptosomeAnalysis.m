@@ -31,12 +31,12 @@ tic
 
 %directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
 %directory = 'E:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\37Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
-directory = '/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_phys';
+directory = '/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_phys';
 
 % path to folder where outputfolder will be created (if doesn't already exist)
 output_dir = fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis',filesep);
 
-repeat           = '4Ca';
+repeat           = '4Cb';
 condition        = 'phys';
 channel_token_RC = '_647';
 channel_token_GC = '_561_reg';
@@ -73,7 +73,7 @@ remove_border  = 0; % to remove the edges of images if there are edge artefacts
 border_width   = 700; % width of border removed (in image coordinates)
 
 filter          = 1;    % to filter the localisation files before further processing based on the following parameters
-min_frames      = 500;  % throw away initial frames to avoid really high density data
+min_frames      = 0;  % throw away initial frames to avoid really high density data
 min_sigma       = 40;   % maximum sigma value of the Gaussian fit
 max_sigma       = 400;  % maximum sigma value of the Gaussian fit
 min_intensity   = 1000; % min number of photons expected for an event

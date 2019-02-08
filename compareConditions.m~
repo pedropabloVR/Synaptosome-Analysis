@@ -29,29 +29,21 @@ close all
 clc
 tic
 
-% Added lines to include the number of localisations per region of interest
-% in the results table. 
+%% Parameters
 
-
-repeats = {'A','B'}; %,'Oct-Nov'};
-% dir_PHYS  = 'F:\synaptosomes\Results_phys';
-% dir_EGTA  = 'F:\synaptosomes\Results_egta';
-% dir_EGTAK = 'F:\synaptosomes\Results_egtak';
-
-% dir_PHYS  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_phys';
-% dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
-% dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
+% File input parameters
+repeats = {'A','B'}; %,'Oct-Nov'}; % Name of the two different repeats for each temperature condition
 
 % Path to directories containing results from Synaptosome analysis for different repeats (can be a cell with only one repeat!)
-Dir_PHYS  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca phys'),...
-             fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb phys')};
-Dir_EGTA  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egta'),...
-             fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
-Dir_EGTAK = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egtak'),...
-             fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
+Dir_PHYS      = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca phys'),...
+                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb phys')};
+Dir_EGTA      = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egta'),...
+                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
+Dir_EGTAK     = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egtak'),...
+                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
         
 % Path to raw localisation files for each repeat (no need to change these,
-% raw data stays the same) - used to calculate the rejection rate. 
+% raw data stays the same) - these are used to calculate the rejection rate. 
 dir_phys_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_phys'),...
                  fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_phys')};
 dir_egta_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_egta'),...
@@ -59,15 +51,17 @@ dir_egta_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridg
 dir_egtak_raw = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_egtak'),...
                  fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_egtak')};
             
-% output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
+% Output directory
 output_dir      = fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/');
 format          = 'thunderstorm';
-magnification   = 10;
 
-imgtype = '_reconstruction_RGB.tif'; % image to mark detected synaptosomes on with circles
-radius  = 100; % radius of the circles
-colour  = [100 100 100]; % colour of the circles (triplet)
+% Reconstructed image parameters
+magnification   = 10; % determines final pixel size in super-resolution reconstructions
+imgtype         = '_reconstruction_RGB.tif'; % image to mark detected synaptosomes on with circles
+radius          = 100; % radius of the circles drawn around detected synaptosomes
+colour          = [100 100 100]; % colour of the circles (triplet)
 
+%% Filtering parameters
 % Parameters for filtering on overlap between channels to detect synaptosomes
 filterOverlapGreen = 0;  % 1 to filter on overlap between red and green to detect synaptosomes
 filterOverlapBlue  = 0;  % 1 to filter on overlap between red and blue  to detect synaptosomes
@@ -887,9 +881,9 @@ for n = 1:length(repeats)
         locs_GC = readLocFile(fullfile(dir_EGTAK,strcat(area_token,'_locs_GC_filtered.csv')),format);
         locs_BC = readLocFile(fullfile(dir_EGTAK,strcat(area_token,'_locs_BC_filtered.csv')),format);
 
-        locs_RC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_647.csv')),format);
-        locs_GC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_561_reg.csv')),format);
-        locs_BC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_488_reg.csv')),format);
+        locs_RC_prefilter = readLocFile(fullfile(dir_EGTAK_raw,strcat(area_token,'_647.csv')),format);
+        locs_GC_prefilter = readLocFile(fullfile(dir_EGTAK_raw,strcat(area_token,'_561_reg.csv')),format);
+        locs_BC_prefilter = readLocFile(fullfile(dir_EGTAK_raw,strcat(area_token,'_488_reg.csv')),format);
 
         % Estimate Fov
         Fov = estimateFov([locs_RC.x; locs_GC.x; locs_GC.x; locs_RC.y; locs_BC.y; locs_BC.y], pixelsize);
@@ -1016,9 +1010,9 @@ for n = 1:length(repeats)
     results_EGTAK.numLocs_GC = numLocs_GC_EGTAK';
     results_EGTAK.numLocs_BC = numLocs_BC_EGTAK';
     
-        results_EGTA.rejectionRate_RC = rejectionRate_RC_EGTA';
-    results_EGTA.rejectionRate_GC = rejectionRate_GC_EGTA';
-    results_EGTA.rejectionRate_BC = rejectionRate_BC_EGTA';
+    results_EGTAK.rejectionRate_RC = rejectionRate_RC_EGTAK';
+    results_EGTAK.rejectionRate_GC = rejectionRate_GC_EGTAK';
+    results_EGTAK.rejectionRate_BC = rejectionRate_BC_EGTAK';
     
     % Write away Ripley's functions before removing NaN columns (to retain
     % information about from which synaptosome the curve came)
@@ -1035,7 +1029,10 @@ for n = 1:length(repeats)
                 'H_all_egtak_RC','H_all_egtak_GC','H_all_egtak_BC',...
                 'H_all_egtak_RG','H_all_egtak_RB','H_all_egtak_GB');
 
-
+    % clear unfiltered localisation tables to free memory
+    clear locs_RC_prefilter locs_GC_prefilter locs_BC_prefilter;
+    
+    
     %% Get clustersize from Ripley's L(r) - r function
 
     % Get clustersize for mCling from Ripley's curves

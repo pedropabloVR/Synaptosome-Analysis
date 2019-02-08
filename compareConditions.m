@@ -29,29 +29,21 @@ close all
 clc
 tic
 
-% Added lines to include the number of localisations per region of interest
-% in the results table. 
+%% File I/O parameters
 
-
-repeats = {'A','B'}; %,'Oct-Nov'};
-% dir_PHYS  = 'F:\synaptosomes\Results_phys';
-% dir_EGTA  = 'F:\synaptosomes\Results_egta';
-% dir_EGTAK = 'F:\synaptosomes\Results_egtak';
-
-% dir_PHYS  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_phys';
-% dir_EGTA  = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egta';
-% dir_EGTAK = 'E:\Experiments\synaptosomes\Results synaptosome_2nd_round\Results_egtak';
+% File input parameters
+repeats = {'A','B'}; %,'Oct-Nov'}; % Name of the two different repeats for each temperature condition
 
 % Path to directories containing results from Synaptosome analysis for different repeats (can be a cell with only one repeat!)
-Dir_PHYS  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca phys'),...
-             fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb phys')};
-Dir_EGTA  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egta'),...
-             fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
-Dir_EGTAK = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egtak'),...
-             fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
+Dir_PHYS      = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca phys'),...
+                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb phys')};
+Dir_EGTA      = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egta'),...
+                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
+Dir_EGTAK     = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egtak'),...
+                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
         
 % Path to raw localisation files for each repeat (no need to change these,
-% raw data stays the same) - used to calculate the rejection rate. 
+% raw data stays the same) - these are used to calculate the rejection rate. 
 dir_phys_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_phys'),...
                  fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_phys')};
 dir_egta_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_egta'),...
@@ -59,30 +51,38 @@ dir_egta_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridg
 dir_egtak_raw = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_egtak'),...
                  fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_egtak')};
             
-% output_dir = fullfile('E:\Experiments\synaptosomes\Results synaptosome_2nd_round',filesep);
+% Output directory
 output_dir      = fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/');
 format          = 'thunderstorm';
-magnification   = 10;
 
-imgtype = '_reconstruction_RGB.tif'; % image to mark detected synaptosomes on with circles
-radius  = 100; % radius of the circles
-colour  = [100 100 100]; % colour of the circles (triplet)
+% Reconstructed image parameters
+magnification   = 10; % determines final pixel size in super-resolution reconstructions
+imgtype         = '_reconstruction_RGB.tif'; % image to mark detected synaptosomes on with circles
+radius          = 100; % radius of the circles drawn around detected synaptosomes
+colour          = [100 100 100]; % colour of the circles (triplet)
 
-% Parameters for filtering on overlap between channels to detect synaptosomes
+%% Filtering parameters
+
+% Channel overlap filter to detect synaptosomes
 filterOverlapGreen = 0;  % 1 to filter on overlap between red and green to detect synaptosomes
 filterOverlapBlue  = 0;  % 1 to filter on overlap between red and blue  to detect synaptosomes
 minOverlapGreen    = 20;  % minimum overlap between red and green to detect synaptosomes
 minOverlapBlue     = 20; % minimum overlap between red and green to detect synaptosomes
 
-% Minimum distance between two synaptosomes
+% Proximity filter: minimum distance between two synaptosomes
 min_dist_between_synaptosomes   = 300; % in nm
-max_Area                        = 2000; % max area of mCling
 
+% Size filter: very "large" synaptosomes, signaled by large areas of the
+% mCLING, are removed
+max_Area    = 2000; % max area of mCling
+
+% Ripley's L(r) - r function parameters
 r_step      = 10;
 R_max       = 1000;
 windowsize  = 80; % pixels
 pixelsize   = 117; % nm
 
+% Flags for showing results
 plot_results_individual_repeats = 1; % 1 to also plot results of individual repeats seperately
 show                            = 0; % to show intermediate results
 flagprint                       = 1; % set to 1 to save the fig visualization of the results
