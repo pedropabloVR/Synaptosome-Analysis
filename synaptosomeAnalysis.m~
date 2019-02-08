@@ -18,7 +18,7 @@
 %   potentially detected synaptosome. 
 
 % Author: Ezra Bruggeman, Laser Analytics Group
-% Last updated: 8 Feb 2018
+% Last updated: 5 Feb 2018
 
 
 clear all
@@ -152,6 +152,7 @@ for i = 1:size(filelist,1)
     writeLocFile(locs_BC,fullfile(path_output,strcat(area_token,'_locs_BC_raw.csv')),format)
       
     
+    
     %% Estimate Fov
     % Assumes there will be at least one localisation close to the edges
     % of the Fov in one of the three channels
@@ -202,35 +203,35 @@ for i = 1:size(filelist,1)
     
     if filter
         % Filtering red channel ---------------------------------------------------
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.frame       > min_frames ,:);
+        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.frame       > 500 ,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
-            locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   > min_sigma  ,:);
-            locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   < max_sigma ,:);
+            locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   > 40  ,:);
+            locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.sigma   < 400 ,:);
         end
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.intensity   > min_intensity,:);
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty < max_uncertainty  ,:);
-        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty > min_uncertainty  ,:);
+        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.intensity   > 1000,:);
+        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty < 40  ,:);
+        locs_RC_filtered = locs_RC_filtered(locs_RC_filtered.uncertainty > 5  ,:);
         
         % Filtering green channel -------------------------------------------------
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > min_frames,:);
+        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.frame       > 500,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
-            locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   > min_sigma  ,:);
-            locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   < max_sigma,:);
+            locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   > 40  ,:);
+            locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.sigma   < 400,:);
         end
         
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.intensity   > min_intensity,:);
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty < max_uncertainty ,:);
-        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty > min_uncertainty ,:);
+        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.intensity   > 500,:);
+        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty < 40 ,:);
+        locs_GC_filtered = locs_GC_filtered(locs_GC_filtered.uncertainty > 5 ,:);
         
         % Filtering blue channel --------------------------------------------------
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > min_frames,:);
+        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.frame       > 500,:);
         if ~strcmp(format_for_filtering,'rapidstorm')
-            locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   > min_sigma  ,:);
-            locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   < max_sigma,:);
+            locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   > 40  ,:);
+            locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.sigma   < 400,:);
         end      
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.intensity   > min_intensity,:);
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty < max_uncertainty ,:);
-        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty > min_uncertainty ,:);
+        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.intensity   > 500,:);
+        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty < 40 ,:);
+        locs_BC_filtered = locs_BC_filtered(locs_BC_filtered.uncertainty > 5 ,:);
     end
     
     % Get number of localisations after filter

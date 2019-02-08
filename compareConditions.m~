@@ -887,9 +887,9 @@ for n = 1:length(repeats)
         locs_GC = readLocFile(fullfile(dir_EGTAK,strcat(area_token,'_locs_GC_filtered.csv')),format);
         locs_BC = readLocFile(fullfile(dir_EGTAK,strcat(area_token,'_locs_BC_filtered.csv')),format);
 
-        locs_RC_prefilter = readLocFile(fullfile(dir_EGTAK_raw,strcat(area_token,'_647.csv')),format);
-        locs_GC_prefilter = readLocFile(fullfile(dir_EGTAK_raw,strcat(area_token,'_561_reg.csv')),format);
-        locs_BC_prefilter = readLocFile(fullfile(dir_EGTAK_raw,strcat(area_token,'_488_reg.csv')),format);
+        locs_RC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_647.csv')),format);
+        locs_GC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_561_reg.csv')),format);
+        locs_BC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_488_reg.csv')),format);
 
         % Estimate Fov
         Fov = estimateFov([locs_RC.x; locs_GC.x; locs_GC.x; locs_RC.y; locs_BC.y; locs_BC.y], pixelsize);
@@ -1016,9 +1016,9 @@ for n = 1:length(repeats)
     results_EGTAK.numLocs_GC = numLocs_GC_EGTAK';
     results_EGTAK.numLocs_BC = numLocs_BC_EGTAK';
     
-    results_EGTAK.rejectionRate_RC = rejectionRate_RC_EGTAK';
-    results_EGTAK.rejectionRate_GC = rejectionRate_GC_EGTAK';
-    results_EGTAK.rejectionRate_BC = rejectionRate_BC_EGTAK';
+        results_EGTA.rejectionRate_RC = rejectionRate_RC_EGTA';
+    results_EGTA.rejectionRate_GC = rejectionRate_GC_EGTA';
+    results_EGTA.rejectionRate_BC = rejectionRate_BC_EGTA';
     
     % Write away Ripley's functions before removing NaN columns (to retain
     % information about from which synaptosome the curve came)
@@ -1035,10 +1035,7 @@ for n = 1:length(repeats)
                 'H_all_egtak_RC','H_all_egtak_GC','H_all_egtak_BC',...
                 'H_all_egtak_RG','H_all_egtak_RB','H_all_egtak_GB');
 
-    % clear unfiltered localisation tables to free memory
-    clear locs_RC_prefilter locs_GC_prefilter locs_BC_prefilter;
-    
-    
+
     %% Get clustersize from Ripley's L(r) - r function
 
     % Get clustersize for mCling from Ripley's curves
