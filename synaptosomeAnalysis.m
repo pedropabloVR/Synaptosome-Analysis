@@ -32,17 +32,17 @@ tic
 
 %directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
 %directory = 'E:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\37Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
-directory = 'D:\PostDoc Cambridge\STORM\synapto_data_from_Janin\Sample\output_reconstructions\Registered_data';
+directory = 'D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
 
 % path to folder where outputfolder will be created (if doesn't already exist)
-output_dir = fullfile('D:\PostDoc Cambridge\STORM\synapto_data_from_Janin\Sample\output_reconstructions\Registered_data',filesep);
+output_dir = fullfile('D:\Experiments\synaptosomes\test after Stas modification 20191024',filesep);
 
 % remember to change the format for filtering to rapidSTORM when using the
 % 37C data sets.
 repeat           = '4Cb';
 condition        = 'phys';
 %Specify here channels names that are used for file namings (could be one or more channels)
-channel_token    = {'_RC', '_GC_reg'};
+channel_token    = {'_647', '_561_reg','_488_reg'};
 N_channel        = size(channel_token,2);
 
 % Single molecule reconstruction settings
@@ -65,7 +65,7 @@ min_nr_locs    = [0; 0];  % minimum nr of locs within min_radius
 P              = [0; 0]; % blobs with fewer pixels will be removed from mask
 
 
-level          = [0; 0] % threshold (0-1) for mask (0 for Otsu's threshold)
+level          = [0; 0]; % threshold (0-1) for mask (0 for Otsu's threshold)
 RefCh          = 1;     %number of the channel which is areference channel for synaptosome analysis
 
 sigma_kernel   = 15; % sigma for generating an image (if format = rapidstorm)
