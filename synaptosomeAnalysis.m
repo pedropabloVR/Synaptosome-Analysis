@@ -31,33 +31,21 @@ tic
 
 %directory = 'F:\synaptosomes\2018_10_10_Pedro_5thRound_EGTAK\output_reconstructions\Registered_data';
 %directory = 'E:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\37Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
-<<<<<<< HEAD
-directory = 'D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
-
-% path to folder where outputfolder will be created (if doesn't already exist)
-output_dir = fullfile('D:\Experiments\synaptosomes\test after Stas modification 20191024',filesep);
-=======
 %directory ='F:\synaptosomes\2018_10_10_Pedro_5thRound_PHYS_ISR\output_reconstructions\Registered_data'; % last setting used before 12/09/2019
 directory = 'D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Cb\Data\thunderSTORM_phys\reconstructions\Registered_data';
 % path to folder where outputfolder will be created (if doesn't already exist)
 output_dir = fullfile('D:\Experiments\synaptosomes\test for supplement figures 20191023',filesep);
->>>>>>> parent of 95d0f9d... Merge branch 'master' of https://github.com/pedropabloVR/Synaptosome-analysis
 
 % remember to change the format for filtering to rapidSTORM when using the
 % 37C data sets. 
 repeat           = '4Cb';
 condition        = 'phys';
-<<<<<<< HEAD
-%Specify here channels names that are used for file namings (could be one or more channels)
-channel_token    = {'_647', '_561_reg','_488_reg'};
-N_channel        = size(channel_token,2);
-=======
+
 
 channel_token_RC = '_647';
 channel_token_GC = '_561_reg';
 channel_token_BC = '_488_reg';
 rotate_channel2  = 0;
->>>>>>> parent of 95d0f9d... Merge branch 'master' of https://github.com/pedropabloVR/Synaptosome-analysis
 
 % Single molecule reconstruction settings
 
@@ -85,15 +73,10 @@ P_RC           = 200; % blobs with fewer pixels will be removed from mask of red
 P_GC           = 0;   % blobs with fewer pixels will be removed from mask of green channel
 P_BC           = 0;   % blobs with fewer pixels will be removed from mask of blue channel
 
-<<<<<<< HEAD
 
-level          = [0; 0]; % threshold (0-1) for mask (0 for Otsu's threshold)
-RefCh          = 1;     %number of the channel which is areference channel for synaptosome analysis
-=======
 level_RC       = 0; % threshold (0-1) for mask red   channel (0 for Otsu's threshold)
 level_GC       = 0; % threshold (0-1) for mask green channel (0 for Otsu's threshold)
 level_BC       = 0; % threshold (0-1) for mask blue  channel (0 for Otsu's threshold)
->>>>>>> parent of 95d0f9d... Merge branch 'master' of https://github.com/pedropabloVR/Synaptosome-analysis
 
 sigma_kernel   = 15; % sigma for generating an image (if format = rapidstorm)
 remove_border  = 0; % to remove the edges of images if there are edge artefacts
