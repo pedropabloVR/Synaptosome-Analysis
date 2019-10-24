@@ -26,7 +26,9 @@
 % 
 % 
 % Author: Ezra Bruggeman, Laser Analytics Group
-% Last updated on 22 Sept 2018
+% Last updated on 25 Feb 2019
+% Accounted for zero values in the denominator of Manders' equation,
+% replacing them with zeros instead of NaNs. 
 
 
 function X = getColocCoefficient(A,B)
@@ -45,7 +47,9 @@ ab = A.*B;
 aa = A.*A;
 bb = B.*B;
 X.mandersCoeff = sum(ab(:))/sqrt(sum(aa(:))*sum(bb(:)));
-X.M1 = sum(sum(A(B > 0)))/sum(A(:));
+X.M1 = sum(sum(A(B > 0)))/sum(A(:)); % sums all the elements of A that correspond to nonzero values of B, and divides by sum of A
 X.M2 = sum(sum(B(A > 0)))/sum(B(:));
-
+if isnan(X.mandersCoeff)
+    X.mandersCoeff = 0;
+end 
 end

@@ -1,4 +1,4 @@
-% This script reads in cropped localisation files (from synaptoCrop, in
+ % This script reads in cropped localisation files (from synaptoCrop, in
 % rapidstorm format) and estimate the radius of clusters using simple RMSD
 % calculation for all individual regions. The RMSDs for all regions are
 % plotted and a mean ± SD is returned.
@@ -11,38 +11,31 @@
 
 
 %% Parameters
-
 clear all
 close all
 clc
 
 format = 'thunderstorm'; % reconstruction software used
-
 % Path to folders of the three conditions (which all contain three
 % subfolders: 'RC','GC' and 'BC' as written away by synaptoCrop)
 
-% dir_phys  = 'F:\Data\Synaptosomes\Experiment_4C\Results\Results_combined\ripley\phys';
-% dir_egta  = 'F:\Data\Synaptosomes\Experiment_4C\Results\Results_combined\ripley\egta';
-% dir_egtak = 'F:\Data\Synaptosomes\Experiment_4C\Results\Results_combined\ripley\egtak';
-repeats = {'A','B'};
-dir_phys  = {'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_A\ripley\phys',...
-            'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_B\ripley\phys'};
-dir_egta  = {'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_A\ripley\egta',...
-            'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_B\ripley\egta'};
-dir_egtak =  {'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_A\ripley\egtak',...
-            'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\Repeat_B\ripley\egtak'};
+ repeats = {'A','B'};
 
-% dir_phys  = fullfile(pwd,'testdata/condition1_phys');  % path to testdata condition 1
-% dir_egta  = fullfile(pwd,'testdata/condition2_egta');  % path to testdata condition 2
-% dir_egtak = fullfile(pwd,'testdata/condition3_egtak'); % path to testdata condition 3
+% For simulations
+ dir_phys  = {'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C\Repeat_A\ripley\phys',...
+              'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C\Repeat_B\ripley\phys'};
+ dir_egta  = {'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C\Repeat_A\ripley\egta',...
+              'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C\Repeat_B\ripley\egta'};
+ dir_egtak = {'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C\Repeat_A\ripley\egtak',...
+              'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C\Repeat_B\ripley\egtak'};
 
 % Results will be saved in a new folder 'rmsd' in this directory
 %output_dir = 'F:\Data\Synaptosomes\Experiment_4C\Results\Results_combined';
-output_dir = 'E:\Experiments\synaptosomes\analysis_20190107\37C_20190118_t20\Results_combined\';
-make_plot = 0;
-flagsave = 1; % 1 to write away results
+output_dir  = 'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C';
+make_plot   = 1;
+flagsave    = 1; % 1 to write away results
 
-stats = 0; % 1 to also do statistical analysis (One-way ANOVA)
+stats       = 0; % 1 to also do statistical analysis (One-way ANOVA)
 % Note that the conclusions from the statistical analysis are only
 % meaningful if the conditions for ANOVA are met (data within each group
 % follow a normal distribution and their variances are the same).
@@ -115,6 +108,9 @@ results_rmsd = results_rmsd(:,[end 1:end-1]);
 
 path_results_rmsd = fullfile(path_output,'results_rmsd.txt');
 writetable(results_rmsd,path_results_rmsd,'Delimiter','\t');
+
+writetable(results_rmsd,[path_output filesep 'results.csv']);
+
 
 %% Concatenate results with other repeats
 
@@ -209,7 +205,7 @@ end
 
 end 
 
-% Write out pooled results
+% Write out pooled results - COMMENTED OUT FOR SIMULATIONS 11/03/2019
 
 % Create new output folder
 path_output = fullfile(output_dir,'rmsd','Repeats_combined');
@@ -220,6 +216,7 @@ path_results_combined = fullfile(path_output,'results_combined_rmsd.mat');
 save(path_results_combined,'results_repeats_pooled');
 path_results_combined = fullfile(path_output,'results_combined_rmsd.txt');
 writetable(results_repeats_pooled,path_results_combined,'Delimiter','\t');
+writetable(results_repeats_pooled,[path_output filesep 'rmsd_pooled_results.csv']);
 
 % Split results table into conditions (for convenience when plotting)
 results_PHYS  = results_repeats_pooled(strcmp(results_repeats_pooled.condition,'phys'),:);

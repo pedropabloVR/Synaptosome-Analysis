@@ -35,24 +35,25 @@ tic
 repeats = {'A','B'}; %,'Oct-Nov'}; % Name of the two different repeats for each temperature condition
 
 % Path to directories containing results from Synaptosome analysis for different repeats (can be a cell with only one repeat!)
-Dir_PHYS      = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca phys'),...
-                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb phys')};
-Dir_EGTA      = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egta'),...
-                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
-Dir_EGTAK     = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Ca egtak'),...
-                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/Results_4Cb egta')};
+Dir_PHYS      = {fullfile('D:\Experiments\synaptosomes\analysis_20190915\Results_4Ca phys'),...
+                 fullfile('D:\Experiments\synaptosomes\analysis_20190915\Results_4Cb phys')};
+Dir_EGTA      = {fullfile('D:\Experiments\synaptosomes\analysis_20190915\Results_4Ca egta'),...
+                 fullfile('D:\Experiments\synaptosomes\analysis_20190915\Results_4Cb egta')};
+Dir_EGTAK     = {fullfile('D:\Experiments\synaptosomes\analysis_20190915\Results_4Ca egtak'),...
+                 fullfile('D:\Experiments\synaptosomes\analysis_20190915\Results_4Cb egtak')};
+  
         
 % Path to raw localisation files for each repeat (no need to change these,
 % raw data stays the same) - these are used to calculate the rejection rate. 
-dir_phys_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_phys'),...
-                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_phys')};
-dir_egta_raw  = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_egta'),...
-                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_egta')};
-dir_egtak_raw = {fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Ca_egtak'),...
-                 fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/4Cb_egtak')};
-            
+dir_phys_raw  = {fullfile('D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Ca\Data\thunderSTORM_phys\reconstructions\Registered_data'),...
+                 fullfile('D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Cb\Data\thunderSTORM_phys\reconstructions\Registered_data')};
+dir_egta_raw  = {fullfile('D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Ca\Data\thunderSTORM_egta\reconstructions\Registered_data'),...
+                 fullfile('D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Cb\Data\thunderSTORM_egta\reconstructions\Registered_data')};
+dir_egtak_raw = {fullfile('D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Ca\Data\thunderSTORM_egtak\reconstructions\Registered_data'),...
+                 fullfile('D:\Experiments\synaptosomes\Datasets_synaptosomes_20181206_4C_37C\4Cb\Data\thunderSTORM_egtak\reconstructions\Registered_data')};
+               
 % Output directory
-output_dir      = fullfile('/Users/pedrovallejo/OneDrive - University Of Cambridge/lag/microscopy work/synaptosomes/test data for synapto-analysis/');
+output_dir      = fullfile('D:\Experiments\synaptosomes\analysis_20190915');
 format          = 'thunderstorm';
 
 % Reconstructed image parameters
@@ -64,17 +65,17 @@ colour          = [100 100 100]; % colour of the circles (triplet)
 %% Filtering parameters
 
 % Channel overlap filter to detect synaptosomes
-filterOverlapGreen = 0;  % 1 to filter on overlap between red and green to detect synaptosomes
-filterOverlapBlue  = 0;  % 1 to filter on overlap between red and blue  to detect synaptosomes
-minOverlapGreen    = 20;  % minimum overlap between red and green to detect synaptosomes
-minOverlapBlue     = 20; % minimum overlap between red and green to detect synaptosomes
+filterOverlapGreen = 1;  % 1 to filter on overlap between red and green to detect synaptosomes
+filterOverlapBlue  = 1;  % 1 to filter on overlap between red and blue  to detect synaptosomes
+minOverlapGreen    = 10;  % minimum overlap between red and green to detect synaptosomes
+minOverlapBlue     = 10;  % minimum overlap between red and green to detect synaptosomes
 
 % Proximity filter: minimum distance between two synaptosomes
 min_dist_between_synaptosomes   = 300; % in nm
 
 % Size filter: very "large" synaptosomes, signaled by large areas of the
 % mCLING, are removed
-max_Area    = 2000; % max area of mCling
+max_Area    = 2000; % max area of mCling (2000 for normal analysis, 2500 for simulations). 
 
 % Ripley's L(r) - r function parameters
 r_step      = 10;
@@ -117,9 +118,9 @@ for n = 1:length(repeats)
 
     % Read in all PHYS results and merge in one table
     if ispc
-        filelist_PHYS = dir([dir_PHYS '\*results.csv']);
+        filelist_PHYS = dir([dir_PHYS filesep '*results.csv']);
     elseif ismac
-        filelist_PHYS = dir([dir_PHYS '/*results.csv']);
+        filelist_PHYS = dir([dir_PHYS filesep '*results.csv']);
     end
 
     % Initialize
@@ -156,7 +157,7 @@ for n = 1:length(repeats)
     results_PHYS = array2table(results_PHYS,'VariableNames',...
         {'synaptosomeID','xCentroid','yCentroid','Area',...
         'OverlapWithGreen','OverlapWithBlue',...
-        'WeightedOverlapWithGreen','WeightedOverlapWithBlue'});
+        'WeightedOverlapWithGreen','WeightedOverlapWithBlue','WeightedOverlapGreenBlue','MandersRG','MandersGR','MandersRB','MandersBR'});
 
     % Add overlapping green and blue area
     results_PHYS.AreaGreen = (results_PHYS.OverlapWithGreen.*results_PHYS.Area)/100;
@@ -209,7 +210,8 @@ for n = 1:length(repeats)
     results_EGTA = array2table(results_EGTA,'VariableNames',...
         {'synaptosomeID','xCentroid','yCentroid','Area',...
         'OverlapWithGreen','OverlapWithBlue',...
-        'WeightedOverlapWithGreen','WeightedOverlapWithBlue'});
+        'WeightedOverlapWithGreen','WeightedOverlapWithBlue','WeightedOverlapGreenBlue','MandersRG','MandersGR','MandersRB','MandersBR'});
+
 
     % Add overlapping green and blue area
     results_EGTA.AreaGreen = (results_EGTA.OverlapWithGreen.*results_EGTA.Area)/100;
@@ -263,7 +265,8 @@ for n = 1:length(repeats)
     results_EGTAK = array2table(results_EGTAK,'VariableNames',...
         {'synaptosomeID','xCentroid','yCentroid','Area',...
         'OverlapWithGreen','OverlapWithBlue',...
-        'WeightedOverlapWithGreen','WeightedOverlapWithBlue'});
+        'WeightedOverlapWithGreen','WeightedOverlapWithBlue','WeightedOverlapGreenBlue','MandersRG','MandersGR','MandersRB','MandersBR'});
+
 
     % Add overlapping green and blue area
     results_EGTAK.AreaGreen = (results_EGTAK.OverlapWithGreen.*results_EGTAK.Area)/100;
@@ -286,6 +289,8 @@ for n = 1:length(repeats)
 
     results_combined.condition = condition_column';
     results_combined = results_combined(:,[end 1:end-1]);
+    
+    results_combined_prefilter = results_combined;
 
     path_results_combined = fullfile(path_output,'results_combined_before_overlap_threshold.mat');
     save(path_results_combined,'results_combined');
@@ -523,10 +528,15 @@ for n = 1:length(repeats)
         
         % Load localisation files prior to filtering
         
-        locs_RC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_647.csv')),format);
-        locs_GC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_561_reg.csv')),format);
-        locs_BC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_488_reg.csv')),format);
+%         locs_RC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_647.csv')),format);
+%         locs_GC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_561_reg.csv')),format);
+%         locs_BC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_488_reg.csv')),format);
 
+        locs_RC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_647.csv')),format); % change back to 647
+        locs_GC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_561_reg.csv')),format); % change back to 561_reg
+        locs_BC_prefilter = readLocFile(fullfile(dir_PHYS_raw,strcat(area_token,'_488_reg.csv')),format); % change back to 488_reg
+
+        
         % Estimate Fov
         Fov = estimateFov([locs_RC.x; locs_GC.x; locs_GC.x; locs_RC.y; locs_BC.y; locs_BC.y], pixelsize);
 
@@ -575,11 +585,16 @@ for n = 1:length(repeats)
             rejectionRate_GC_PHYS_i(j,1) = (size(locs_GC_cropped_prefilter,1) - size(locs_GC_cropped,1))/size(locs_GC_cropped_prefilter,1) * 100;
             rejectionRate_BC_PHYS_i(j,1) = (size(locs_BC_cropped_prefilter,1) - size(locs_BC_cropped,1))/size(locs_BC_cropped_prefilter,1) * 100;
             
-            % Write away cropped localisation files
+            % Write away cropped localisation files and unfiltered ones
+            % too, for comparison. 
             writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
             writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
             writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
 
+%             writeLocFile(locs_RC_cropped_prefilter,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)
+%             writeLocFile(locs_GC_cropped_prefilter,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)
+%             writeLocFile(locs_BC_cropped_prefilter,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)           
+%             
             X_RC = locs_RC_cropped.x;
             Y_RC = locs_RC_cropped.y;
             X_GC = locs_GC_cropped.x;
@@ -686,11 +701,11 @@ for n = 1:length(repeats)
     numLocs_RC_EGTA = [];
     numLocs_GC_EGTA = [];
     numLocs_BC_EGTA = [];
-
+    
     rejectionRate_RC_EGTA = [];
     rejectionRate_GC_EGTA = [];
     rejectionRate_BC_EGTA = [];
-    
+
     % Create subfolders
     mkdir(fullfile(path_output_ripley,condition,'RC'));
     mkdir(fullfile(path_output_ripley,condition,'GC'));
@@ -707,6 +722,10 @@ for n = 1:length(repeats)
         locs_RC = readLocFile(fullfile(dir_EGTA,strcat(area_token,'_locs_RC_filtered.csv')),format);
         locs_GC = readLocFile(fullfile(dir_EGTA,strcat(area_token,'_locs_GC_filtered.csv')),format);
         locs_BC = readLocFile(fullfile(dir_EGTA,strcat(area_token,'_locs_BC_filtered.csv')),format);
+
+%         locs_RC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_647.csv')),format);
+%         locs_GC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_561_reg.csv')),format);
+%         locs_BC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_488_reg.csv')),format);
 
         locs_RC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_647.csv')),format);
         locs_GC_prefilter = readLocFile(fullfile(dir_EGTA_raw,strcat(area_token,'_561_reg.csv')),format);
@@ -734,6 +753,11 @@ for n = 1:length(repeats)
         num_Locs_RC_i = zeros(num_synaptosomes,1);
         num_Locs_GC_i = zeros(num_synaptosomes,1);
         num_Locs_BC_i = zeros(num_synaptosomes,1);
+        
+        rejectionRate_RC_EGTA_i = zeros(num_synaptosomes,1);
+        rejectionRate_GC_EGTA_i = zeros(num_synaptosomes,1);
+        rejectionRate_BC_EGTA_i = zeros(num_synaptosomes,1);
+    
                 
         % Loop over all synaptosomes
         for j = 1:num_synaptosomes
@@ -761,7 +785,11 @@ for n = 1:length(repeats)
             writeLocFile(locs_RC_cropped,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
             writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
             writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
-
+            
+%             writeLocFile(locs_RC_cropped_prefilter,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)
+%             writeLocFile(locs_GC_cropped_prefilter,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)
+%             writeLocFile(locs_BC_cropped_prefilter,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)           
+%             
             X_RC = locs_RC_cropped.x;
             Y_RC = locs_RC_cropped.y;
             X_GC = locs_GC_cropped.x;
@@ -914,6 +942,11 @@ for n = 1:length(repeats)
         num_Locs_GC_i = zeros(num_synaptosomes,1);
         num_Locs_BC_i = zeros(num_synaptosomes,1);
         
+        rejectionRate_RC_EGTAK_i = zeros(num_synaptosomes,1);
+        rejectionRate_GC_EGTAK_i = zeros(num_synaptosomes,1);
+        rejectionRate_BC_EGTAK_i = zeros(num_synaptosomes,1);
+        
+        
         % Loop over all synaptosomes
         for j = 1:num_synaptosomes
 
@@ -941,6 +974,11 @@ for n = 1:length(repeats)
             writeLocFile(locs_GC_cropped,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
             writeLocFile(locs_BC_cropped,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'.csv')),format)
 
+            % Don't write away cropped raw data - this messes up the RMSD calculation
+%             writeLocFile(locs_RC_cropped_prefilter,fullfile(path_output_ripley,condition,'RC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)
+%             writeLocFile(locs_GC_cropped_prefilter,fullfile(path_output_ripley,condition,'GC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)
+%             writeLocFile(locs_BC_cropped_prefilter,fullfile(path_output_ripley,condition,'BC',strcat(area_token,'_',condition,'_',num2str(synaptosomeID(j)),'_raw_','.csv')),format)           
+%             
             X_RC = locs_RC_cropped.x;
             Y_RC = locs_RC_cropped.y;
             X_GC = locs_GC_cropped.x;
@@ -1207,6 +1245,15 @@ for n = 1:length(repeats)
 
     
     %% Concatenate results to that of other repeats (if any)
+    
+    % Save results prefiltering with number of localisations column added
+%     path_results_combined = fullfile(path_output,'results_combined_before_overlap_threshold.mat');
+%     save(path_results_combined,'results_combined');
+% 
+%     path_results_combined = fullfile(path_output,'results_combined_before_overlap_threshold.txt');
+%     writetable(results_combined,path_results_combined,'Delimiter','\t');
+
+    
     
     % Create an extra column for repeat
     clear var repeat

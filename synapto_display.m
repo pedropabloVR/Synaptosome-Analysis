@@ -16,26 +16,27 @@
 % Updated 28/09/2018
 
 %% Load raw synaptosome reconstructions  
-close all
+function [] = synapto_display(Path,output_dir,condition,repeat)
 
+if nargin < 2
+    % default argument values
+    Path        = 'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C\Repeat_B\ripley\egtak\images';
+    output_dir  = 'E:\Experiments\synaptosomes\analysis_20190305\Results_combined_4C';
+    % load .csv file with trimmed pooled results after manual removal of "ugly"
+    % regions
+    csv_path = "E:\Experiments\synaptosomes\analysis_20190107\4C_results\Results_combined\results_combined_pooled_trimmed.csv";
 
-Path        = 'E:\Experiments\synaptosomes\analysis_20190107\37C_results_thresh30\Results_combined\Repeat_B\ripley\phys\images';
-output_dir  = 'E:\Experiments\synaptosomes\analysis_20190107\37C_results_thresh30\Results_combined';
+    % select area token and label token for your data files
+    condition = 'egtak';
+    repeat    = 'B';
 
-% load .csv file with trimmed pooled results after manual removal of "ugly"
-% regions
-
-csv_path = "E:\Experiments\synaptosomes\analysis_20190107\4C_results\Results_combined\results_combined_pooled_trimmed.csv";
-results_pooled = resultscombinedpooledtrimmed;
-
-% select area token and label token for your data files
-condition = 'phys';
-repeat    = 'B';
+end 
 im_cutoff = 20;
 show      = 0;
 RC_token  = ['_' condition '_RC_synaptosome_'];
 GC_token  = ['_' condition '_GC_synaptosome_'];
 BC_token  = ['_' condition '_BC_synaptosome_'];
+trimmed   = 0;
 
 [PathNameRC, FileNames_RC] = GetImages(Path, RC_token );
 [PathNameGC, FileNames_GC] = GetImages(Path, GC_token );
@@ -49,27 +50,30 @@ disp('Opening files in following folder:');
 disp(PathNameRC);
 disp(['Number of files found: ', num2str(N_files)]);
 
-% choose names from relevant repeat and condition
-sampleIDs_repeat = results_pooled(strcmp(results_pooled.Repeat,repeat),:);
-sampleIDs_condition = sampleIDs_repeat(strcmp(sampleIDs_repeat.condition,condition),:);
-num_trimmed_files = size(sampleIDs_condition);
-sampleIDs_names = cell(num_trimmed_files(1),1);
-% concatenate names of sample ID and synaptosome ID
-for i = 1:num_trimmed_files(1)
-    temp = strsplit(sampleIDs_condition.sampleID(i),'_');
-    samp_ID = strcat(temp(1)," ",temp(2));
-    sampleIDs_names{i,1} = strcat(samp_ID," " ,num2str(sampleIDs_condition.synaptosomeID(i)));
+if trimmed
+    results_pooled = resultscombinedpooledtrimmed;
+    % choose names from relevant repeat and condition
+    sampleIDs_repeat    = results_pooled(strcmp(results_pooled.Repeat,repeat),:);
+    sampleIDs_condition = sampleIDs_repeat(strcmp(sampleIDs_repeat.condition,condition),:);
+    num_trimmed_files   = size(sampleIDs_condition);
+    sampleIDs_names     = cell(num_trimmed_files(1),1);
 
+    % concatenate names of sample ID and synaptosome ID
+    for i = 1:num_trimmed_files(1)
+        temp = strsplit(sampleIDs_condition.sampleID(i),'_');
+        samp_ID = strcat(temp(1)," ",temp(2));
+        sampleIDs_names{i,1} = strcat(samp_ID," " ,num2str(sampleIDs_condition.synaptosomeID(i)));
+
+    end 
 end 
-
 %% display images 
-imred = cell(N_files,1);
+imred   = cell(N_files,1);
 imgreen = cell(N_files,1);
-imblue = cell(N_files,1);
+imblue  = cell(N_files,1);
 overlay = cell(N_files,1);
-red = cell(N_files,1);
-green = cell(N_files,1);
-blue = cell(N_files,1);
+red     = cell(N_files,1);
+green   = cell(N_files,1);
+blue    = cell(N_files,1);
 imlabel = cell(N_files,1);
 im_names = cell(N_files,1);
 trimmed_names_indices = false(N_files,1);
@@ -103,8 +107,8 @@ for i = 1: N_files
     blue{i,1}       = cat(3,zeros(size(imred{i,1})),zeros(size(imred{i,1})),imblue{i,1});
     
     % write out labels for each image
-    imlabel{i,1}    = ones(im_size(1),im_size(1));
-    im_size2        = size(imlabel{i,1});
+    imlabel{i,1}        = ones(im_size(1),im_size(1));
+    im_size2            = size(imlabel{i,1});
     [filepath,name,ext] = fileparts(FileNames_RC{i});
     string_length       = strlength(name);
     string              = strsplit(name,'_');
@@ -113,28 +117,32 @@ for i = 1: N_files
     imlabel{i,1}        = insertText(imlabel{i,1},position,im_names{i,1},'AnchorPoint','Center','TextColor','black','FontSize',16,'BoxColor','white');
     imlabel{i,1}        = rot90(imlabel{i,1});
     
-    % now choose only images with labels which correspond to labels on the
-    % trimmed spreadsheet
-    for lp = 1:num_trimmed_files(1)
-        same = strcmp(im_names{i,1},sampleIDs_names{lp});
-        if same 
-         trimmed_names_indices(i) = true;  
-        end    
+    if trimmed 
+        % now choose only images with labels which correspond to labels on the
+        % trimmed spreadsheet
+        for lp = 1:num_trimmed_files(1)
+            same = strcmp(im_names{i,1},sampleIDs_names{lp});
+            if same 
+             trimmed_names_indices(i) = true;  
+            end    
+        end 
     end 
     
 end 
 
-% Keep only images which correspond to selected ones on the trimmed
-% spreadsheet
-red     = red(trimmed_names_indices,:);
-green   = green(trimmed_names_indices,:);
-blue    = blue(trimmed_names_indices,:);
-overlay = overlay(trimmed_names_indices,:);
-imlabel = imlabel(trimmed_names_indices,:);
-N_files = size(red,1);
-% cycle through the images, 20 at a time, display them, and then continue
-% with the next 20 until there are none left
+if trimmed
 
+    % Keep only images which correspond to selected ones on the trimmed
+    % spreadsheet
+    red     = red(trimmed_names_indices,:);
+    green   = green(trimmed_names_indices,:);
+    blue    = blue(trimmed_names_indices,:);
+    overlay = overlay(trimmed_names_indices,:);
+    imlabel = imlabel(trimmed_names_indices,:);
+    N_files = size(red,1);
+    % cycle through the images, 20 at a time, display them, and then continue
+    % with the next 20 until there are none left
+end 
 % divide arrays into sub-arrays with 20 images each
 remainder = mod(N_files,im_cutoff);
 if remainder >0
@@ -173,7 +181,8 @@ for j = 1:num_sub_arrays
     set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
     filename = [condition '_synapto_montage_' num2str(j)];
     print(h,[path_output filesep filename],'-dpdf','-r300')
-    clear red_j green_j blue_j overlay_j imlabel_j 
+    clear red_j green_j blue_j overlay_j imlabel_j
+    close(h);
 end 
 
 % Display image montage

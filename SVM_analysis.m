@@ -17,9 +17,9 @@ clc
 
 %% Parameters
 
-path_data = '/Users/Ezra/Desktop/data_37C_classified.mat';
-
-fraction_train = 0.80; % fraction of data used for training 
+%path_data = '/Users/Ezra/Desktop/data_37C_classified.mat';
+load data_4C20190305_classified.mat
+fraction_train = 0.60; % fraction of data used for training 
 
 fix_rng = 0; % 1 to fix random number generator (for reproducible results)
 
@@ -35,7 +35,7 @@ display_gallery = 1;
 
 % Load data
 % load(path_data);
-data = resultscombinedpooledtrimmed;
+data = data_4C20190305_classified;
 % Remove rows that have -1 value in any of the Ripley's columns
 data(ismember(data.clustersizeRC,-1),:)=[];
 data(ismember(data.clustersizeGC,-1),:)=[];
@@ -45,15 +45,15 @@ data(ismember(data.interclusterdistRB,-1),:)=[];
 data(ismember(data.interclusterdistGB,-1),:)=[];
 
 % Convert categorical labels 'phys', 'egta' and 'egtak' to integers to matrix
-condition = grp2idx(table2array(data(:,1)));
+condition = grp2idx(table2array(data(:,2)));
 condition = array2table(condition,'VariableNames',{'condition'});
 
 % Get the labels
-y = cell2mat(data.Class);
+y = data.class;
 
 % Only select useful measurements from data table
 %X = [data(:,1:7) data(:,12:13) data(:,8:11) data(:,14:end)];
-X = [condition data(:,12:end)];
+X = [condition data(:,11:end)];
 
 
 %% 2) Divide in training and test set

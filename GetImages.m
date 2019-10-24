@@ -7,7 +7,8 @@ function [ PathName, FileNames_ch ] = GetImages( DefaultPath, channel_token )
 % Updated 28/09/2018
 
 
-PathName = uigetdir(DefaultPath , 'Choose directory containing the png STORM images...');
+%PathName = uigetdir(DefaultPath , 'Choose directory containing the png STORM images...');
+PathName = DefaultPath;
 FileList_ch = dir([PathName,filesep,'*',channel_token,'*','.png']); % List all the red channel files
 
 N_files = length(FileList_ch); %number of files
